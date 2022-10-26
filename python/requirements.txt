@@ -1,0 +1,6 @@
+zmq
+cbor
+numpy
+torch
+matplotlib
+tensorflow

@@ -1,0 +1,5 @@
+gym
+gym[classic_control]
+torch
+torchvision
+matplotlib
