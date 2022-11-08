@@ -1,2 +1,0 @@
-model_checkpoint_path: "dense_model_kinematic"
-all_model_checkpoint_paths: "dense_model_kinematic"

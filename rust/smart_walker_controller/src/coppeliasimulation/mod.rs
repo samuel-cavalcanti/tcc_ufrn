@@ -1,9 +1,8 @@
-mod simple_scene_with_easy_obstacles;
-
+mod coppeliasim;
 mod coppeliasim_sensors;
 mod target;
 
-pub use simple_scene_with_easy_obstacles::SimpleSceneWithEasyObstacles;
+pub use coppeliasim::Coppeliasim;
 
 pub struct Image {
     pub data: Vec<u8>,

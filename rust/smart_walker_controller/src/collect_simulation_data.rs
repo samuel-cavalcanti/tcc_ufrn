@@ -1,7 +1,7 @@
-use crate::{coppeliasimulation::SimpleSceneWithEasyObstacles, controller};
+use crate::{controller, coppeliasimulation::Coppeliasim};
 
 pub fn collect_data() {
-    let mut sim = SimpleSceneWithEasyObstacles::new();
+    let mut sim = Coppeliasim::new();
 
     sim.enable_step();
 

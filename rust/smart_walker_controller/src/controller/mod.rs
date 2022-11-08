@@ -1,9 +1,6 @@
 mod frederico;
-mod deep_learning_model;
-mod nn_controller;
 mod manual_controller;
-
+mod pid;
 
 pub use frederico::FredericoController;
 pub use manual_controller::ManualController;
-
