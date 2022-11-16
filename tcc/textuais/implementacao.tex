@@ -1,0 +1,101 @@
+%%
+%% Capítulo 4: Figuras, gráficos e tabelas
+%%
+
+\mychapter{Implementação}
+\label{Cap:Implementacao}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi tristique, orci mollis tincidunt dignissim, purus lectus molestie odio, vitae pharetra nisi sapien et justo. Fusce consequat et elit condimentum tincidunt. In eu venenatis tortor, quis lobortis tellus. Mauris tincidunt gravida ante. Pellentesque ante elit, lacinia interdum bibendum sed, cursus non orci. Ut et diam nec justo efficitur tincidunt. Fusce convallis facilisis varius. Integer tempor hendrerit maximus.
+
+\begin{algorithm}
+%% \SetLine
+\Entrada{$x$: vetores de valores; $y$ = $L(x)$; $p$: valor de entrada a ser calculado }
+\Saida{$s$ = $L(p)$}
+$n \leftarrow \mathtt{comprimento}(x)$\;
+$s \leftarrow 0$\;
+\Para {$i=1$ \Ate $n$} {
+	$L \leftarrow 1$\;
+	\Para {$j=1:1:n$} {
+		\Se{$i \neq j$} {
+			$L \leftarrow L* \left( \dfrac{p-x[j]}{x[i]-x[j]} \right) $
+		}
+	}
+	$s \leftarrow s + L*y[i]$\;
+}
+\Retorna $s$\;
+\caption{Algoritmo para interpolação de Lagrange.}
+\label{algo:1}
+\end{algorithm}
+
+\begin{algorithm}
+%% \SetLine
+\Entrada{$a$: valor inicial; $b$: valor final; $n$: número de subintervalos (deve ser múltiplo de 2)  }
+\tcc{A função a ser integrada é definida em uma função denominada \texttt{f}, fora do escopo deste algoritmo.}
+\Saida{$I$ = integral de \texttt{f} entre $a$ e $b$}
+$h \leftarrow$ $\dfrac{b-a}{n}$\;
+$x[1] \leftarrow a$\;
+$y[1] \leftarrow f(a)$\;
+$I \leftarrow 0$\;
+$k \leftarrow 2$\;
+\Enqto {$k <= n$} {
+	$x[i] \leftarrow x[i-1] + h$\;
+	$y[i] \leftarrow f(x[i])$\;
+	\eSe{$i \% 2 = 0$} {
+		$I \leftarrow I + 4*y[i]$\;
+	}
+	{
+		$I \leftarrow I + 2*y[i]$\;
+	}
+	$k = k+1$\;
+}
+$x[n+1] \leftarrow b$\;
+$y[n+1] \leftarrow f(x[i+1])$\;
+$I \leftarrow I + \dfrac{h}{3}*(I + y[n+1])$\;
+\Retorna $I$\;
+\caption{Algoritmo para a integração pelo primeiro método de Simpson.}
+\label{algo:2}
+\end{algorithm}
+
+
+
+\section{Nulla molestie libero sed}
+\label{Sec:expressoesMatematicas}
+
+\begin{eqnarray} \label{eq:PDF:RSR}
+  p \left( \gamma \right) & = & \frac{1}{2} \sqrt{\frac{M}{\gamma \bar{\gamma}_{b}}} \frac{1}{ \prod_{i=1}^M {\sqrt{\tilde{\gamma}_i}}}
+  \int_0^{\sqrt{M \delta}} \int_0^{\sqrt{M \delta} - r_M } \cdots
+  \int_0^{\sqrt{M \delta} - \sum_{i = 3}^M {r_i } } \nonumber \\
+  & & p \left( {\frac{\sqrt{M \delta} - \sum_{i = 2}^M {r_i }}{\sqrt{\tilde{\gamma}_1}} ,
+  \frac{r_2}{\sqrt{\tilde{\gamma}_2}} , \ldots ,\frac{r_M}{\sqrt{\tilde{\gamma}_M}} } \right)
+  \, dr_2 \cdots dr_{M-1} \, dr_M
+\end{eqnarray}
+% sem linha em branco
+ou:
+% sem linha em branco
+\begin{equation} \label{eq:TrCGI}
+  T(r) = \frac{1}{f_m}
+  \left( \frac{\pi}{2} \sum_{i=1}^M
+  {\tilde{r}_i^2 \dot{\varsigma}_i^2}\right)^{-1/2}
+  \frac
+  {\begin{array}{ll}
+  \int_0^{\rho \sqrt{M}} \int_0^{\rho \sqrt{M} - r_M } \cdots
+  \int_0^{\rho \sqrt{M} - \sum_{i = 3}^M {r_i } } \int_0^{\rho \sqrt{M} -
+  \sum_{i = 2}^M {r_i } }  \\
+  p \left( {\frac{r_1}{\tilde{r}_1} ,
+  \frac{r_2}{\tilde{r}_2} , \ldots ,\frac{r_M}{\tilde{r}_M} } \right)
+  \, dr_1 \, dr_2 \cdots dr_{M-1} \, dr_M \\ \end{array}}
+  {\begin{array}{ll}
+  \int_0^{\rho \sqrt{M}} \int_0^{\rho \sqrt{M} - r_M } \cdots
+  \int_0^{\rho \sqrt{M} - \sum_{i = 3}^M {r_i } } \\
+  p \left( {\frac{\rho \sqrt{M} - \sum_{i = 2}^M {r_i }}{\tilde{r}_1} ,
+  \frac{r_2}{\tilde{r}_2} , \ldots ,\frac{r_M}{\tilde{r}_M} } \right)
+  \, dr_2 \cdots dr_{M-1} \, dr_M \\ \end{array}}
+\end{equation}
+
+
+\begin{equation}
+y = g(x) = g(x_{PO}) + \left.\frac{dg}{dx}\right|_{x=x_{PO}}
+\frac{(x-x_{PO})}{1!} + \left.\frac{d^2g}{dx^2}\right|_{x=x_{PO}}
+\frac{(x-x_{PO})^2}{2!} + \cdots
+\label{Eq:Taylor}
+\end{equation}
+

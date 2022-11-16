@@ -1,0 +1,21 @@
+\babel@toc {brazil}{}\relax 
+\contentsline {chapter}{Sumário}{i}{section*.3}%
+\contentsline {chapter}{Lista de Figuras}{iii}{section*.5}%
+\contentsline {chapter}{Lista de Tabelas}{v}{section*.7}%
+\contentsline {chapter}{\numberline {1}Introdução}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Motivação}{1}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Objetivos}{1}{section.1.2}%
+\contentsline {chapter}{\numberline {2}Fundamentação Teórica}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}O problema da cinemática de um robô móvel}{3}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Aprendizado de máquina}{5}{section.2.2}%
+\contentsline {section}{\numberline {2.3}Controlador estabilizante Federico}{8}{section.2.3}%
+\contentsline {chapter}{\numberline {3}Trabalhos relacionados}{11}{chapter.3}%
+\contentsline {chapter}{\numberline {4}Problema}{13}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Aliquam erat neque}{13}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Quisque euismod urna}{14}{section.4.2}%
+\contentsline {chapter}{\numberline {5}Implementação}{15}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Nulla molestie libero sed}{17}{section.5.1}%
+\contentsline {chapter}{\numberline {6}Experimentos e Resultados}{19}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Conclusão}{21}{chapter.7}%
+\contentsline {chapter}{Referências bibliográficas}{22}{section*.9}%
+\contentsline {chapter}{\numberline {A}Informações adicionais}{25}{appendix.A}%
