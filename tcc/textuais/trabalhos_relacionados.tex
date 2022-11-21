@@ -69,7 +69,7 @@ a função ação-valor ótima $Q^*$ independe do algoritmo utilizado
 para selecionar uma ação. \textit{Q-learning} é definido:
 
 \begin{equation} 
-    Q(S_t,A_t) \leftarrow (S_t,A_t) + \alpha[R + \gamma  \max_aQ(S_{t +1},a) - Q(S_t,A_t)]
+    Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha[R + \gamma  \max_aQ(S_{t +1},a) - Q(S_t,A_t)]
 \end{equation}
 onde $S_t$ e $A_t$ é respectivamente estado,ação,  $ \max_a Q(S_{t +1},a)$ é o valor da
 ação de maior valor no estado $S_{t+1}$ e as constantes $\alpha$, $\gamma$ são taxas
@@ -149,16 +149,25 @@ dessa rede é uma aproximação da função valor ótima $Q^*$, uma das vantagen
 de utilizar redes neurais é fato de poder utilizar estados continuos sem a
 necessidade de discretização, no entanto o espaço de ação ainda é necessário
 ser discreto. Muitas das vezes esse algoritmo é utilizado
-tendo como estado $S$ sendo uma imagem que muitas das vezes é preprocessada
-antes de enviada para a rede neural. O algoritmo do \textit{Deep Q-learning Network}
+tendo como estado $S$ sendo uma imagem que normalmente é preprocessada
+antes de enviada para a rede neural. Para ter um treinamento mais estável,
+se é utilizado duas redes, onde a rede alvo é atualizada usando o parâmetro
+de polyak $\rho$ após o fim de uma época $e$.
+O algoritmo do \textit{Deep Q-learning Network}
 pode ser vista no Algoritmo \ref{Deep:Q-learning:}
-
 
 \begin{algorithm}[H]
     %% \SetLine
-    inicialize a memória $M$ com a capacidade $C$
+    Parâmetros dos algoritmo:
+    importância de um paço $\alpha \in (0,1]$,
+    taxa de aprendizado $\gamma \in (0,1]$,
+    polyak $\rho \in (0,1]$,
+    capacidade da memória $C \in \mathbb{N}$ 
+
 
     inicialize os pesos $\theta$ da rede neural que aproxima a função $Q$ com valores aleatórios
+
+    inicialize os pesos $\theta_{\text{target}}  \leftarrow \theta$ rede alvo $Q_{\text{target}}$
 
     \Para {$e \leftarrow 0$ \Ate $E$} {
         inicialize a sequencia $s_0$
@@ -178,37 +187,143 @@ pode ser vista no Algoritmo \ref{Deep:Q-learning:}
             
             armazene a transição $(\phi_t,a_t,r_t,\phi(t+1))$ na memória $M$
 
-            Selecione $K$ amostras para formar um minibatch de transições
+            \Se {$K \ge$ total de transições armazenadas}{
+                Selecione $K$ amostras para formar um minibatch de transições
 
-            inicialize o conjunto $y$ de valores desejados
+                inicialize o conjunto $y$ de valores desejados
+    
+                \Para {$k \leftarrow =0$ \Ate $K$}{
+    
+    
+                    \eSe {$s_k$ é terminal}{
+                    
+                        $y_k \leftarrow r_k$
+                      }
+                      {
+                        $y_k \leftarrow r_k + \gamma \max_aQ(\phi_k,a_k)$
+                      }
+                    
+                }
+    
+                atualize os pesos $\theta$ baseado no erro $\frac{1}{|K|} \sum_{b =0}^{K}(y -Q(\phi_b,a_b))^2$
 
-            \Para {$k \leftarrow =0$ \Ate $K$}{
-
-
-                \eSe {$s_k$ é terminal}{
-                
-                    $y_k \leftarrow r_k$
-                  }
-                  {
-                    $y_k \leftarrow r_k + \gamma \max_aQ(\phi_k,a_k)$
-                  }
-                
+        
             }
 
-            atualize os pesos $\theta$ baseado no erro $(y -Q(\phi,a_k))^2$
+            \Se {$s_{t+1}$ é terminal}{
+                
+                $j \leftarrow N_p$  \textbf{ fim do loop de paços}
+              }
 
         }
+
+        ao fim de uma época,atualize os pesos da rede alvo
+        $\theta_{\text{target}}  \leftarrow \rho \theta_{\text{target}}  + (1-\rho) \theta$
         
     }
-    \Retorna a rede neural com os pesos $\theta$
+    \Retorna a rede neural $Q_{\text{target}}$
     \caption{Algoritmo Deep Q-learning}
     \label{Deep:Q-learning:}
 \end{algorithm}
 
+Como dito anteriormente A \textit{Deep Q-learning}, possuí o espaço das ações são discretas,
+visando tornar o espaço de ações também continuas é acrescentando mais
+uma rede neural para aproximar a política $\mu$,
+desta forma temos um algoritmo baseado na equação \textit{Q-learning} que permite
+aprender um sistema de entrada e saída contínua.
+\begin{flalign} 
+    A_t = \mu(S_t)\\
+    Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha[R + \gamma  Q(S_{t +1},\mu(S_{t+1})) - Q(S_t,A_t)]
+\end{flalign}
+Enquanto temos uma rede neural $Q$ que busca encontrar a função ação-valor ótima $Q^*$, temos uma
+nova rede neural que através do gradiente ascendente buscar encontrar a política $\mu$
+que maximiza a recompensa da função valor aproximada $Q(S,\mu(S))$. O algoritmo do \textit{Deep Deterministic Policy Gradient}
+pode ser vista no Algoritmo \ref{Deep Deterministic Policy Gradient:}
+
+\begin{algorithm}[H]
+    %% \SetLine
+    Parâmetros dos algoritmo:
+    importância de um paço $\alpha \in (0,1]$,
+    taxa de aprendizado $\gamma \in (0,1]$,
+    polyak $\rho \in (0,1]$,
+    capacidade da memória $C \in \mathbb{N}$ 
+
+    inicialize a memória $M$ com a capacidade $C$
+
+    inicialize os pesos $\theta$ da rede neural que aproxima a função $Q$ com valores aleatórios
+
+    inicialize os pesos $\theta_\mu$ da rede neural que a aproxima da política $\mu(\phi)$ com valores aleatórios
+
+    inicialize os pesos $\theta_{\text{target}}  \leftarrow \theta$ rede alvo $Q_{\text{target}}$
+
+    inicialize os pesos $\theta_{\mu_{\text{target}}}  \leftarrow \theta_\mu$ rede alvo $\mu_{\text{target}}$
 
 
+    \Para {$e \leftarrow 0$ \Ate $E$} {
+        inicialize a sequencia $s_0$
+
+        inicialize a sequência preprocessada $\phi_0 \leftarrow \phi(s_0)$ 
+        
+
+        \Para {$j \leftarrow 0$ \Ate $n$} {
+            Escolha a ação $a_t$ do estado processado $phi_t$ usando a rede  $\mu(\phi) + \epsilon$, onde
+            $\epsilon$ é um ruído que controla a exploração, $a_t \leftarrow \mu(\phi_t)  + \epsilon$ 
+
+            Realize a ação $a_t$ e observe a recompensa $r_t$ e o nova imagem $x_{t+1}$
+            
+            $s_{t+1}  \leftarrow (s_t, a_t, x_{t+1})$   
+
+            preprocesse a sequencia $\phi_{t+1} \leftarrow \phi(t+1)$
+            
+            armazene a transição $(\phi_t,a_t,r_t,\phi(t+1))$ na memória $M$
+
+            \Se {$K \ge$ total de transições armazenadas}{
+                Selecione $K$ amostras para formar um minibatch de transições
+
+                inicialize o conjunto $y$ de valores desejados
+    
+                \Para {$k \leftarrow =0$ \Ate $K$}{
+    
+    
+                    \eSe {$s_k$ é terminal}{
+                    
+                        $y_k \leftarrow r_k$
+                      }
+                      {
+                        $a_d = \mu_{\text{target}}(\phi_k)$
+    
+                        $y_k \leftarrow r_k + \gamma Q_{\text{target}}(\phi_k,a_d)$
+                      }
+                    
+                }
+
+                atualize os pesos $\theta$ baseado no erro  $\frac{1}{|K|} \sum_{b =0}^{K} (y -Q(\phi_b,\mu(\phi_b)))^2$
+                
+                atualize os pesos $\theta_\mu$ baseado no gradiente ascendente:
+                $\nabla_{\theta_\mu} \frac{1}{|K|} \sum_{b =0}^{K} Q(\phi_b,\mu(\phi_b))$
+            
+            }
+
+           
+        }
+
+        atualize os pesos da rede alvo $\theta_{\text{target}}  \leftarrow \rho \theta_{\text{target}}  + (1-\rho) \theta$
+
+        atualize os pesos da rede alvo $\theta_{\mu_{\text{target}}}  \leftarrow \rho \theta_{\mu_{\text{target}}}  + (1-\rho)\theta_\mu$
+
+        
+    }
+    \Retorna as redes neurais $Q_{\text{target}}$, $\mu_{\text{target}}$
+    \caption{Algoritmo Deep Deterministic Policy Gradient}
+    \label{Deep Deterministic Policy Gradient:}
+\end{algorithm}
+
+
+\subsection{Conclusão da revisão bibliográfica}
 Os artigos demostram que para um problema simples como posicionar ou estabilizar
-um robô de acionamento diferencial, soluções com aprendizado de máquina por
-reforço envolvendo variantes de \textit{Q-learning} não são interessantes,
-pois usam muito mais memória, processamento e apresentam resultados equiparáveis como
-soluções utilizando leis clássicas de controle. 
+um robô de acionamento diferencial em um ambiente sem obstáculos ou com
+obstáculos simples, as soluções com aprendizado de máquina por reforço
+envolvendo variantes de \textit{Q-learning} visando substituir as
+leis clássicas de controle não são interessantes, pois usam muito mais
+memória, processamento e apresentam resultados equiparáveis quando não
+piores que as soluções utilizando leis clássicas de controle. 
