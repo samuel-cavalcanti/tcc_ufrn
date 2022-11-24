@@ -5,6 +5,7 @@ import numpy as np
 
 SIM_DATA_PATH = 'simulation_data/sim_data.npy'
 SIM_DATA_ROTATE_PATH ='simulation_data/sim_data_rotate.npy'
+SIM_DATA_30MS_PATH ='simulation_data/sim_data_30ms.npy'
 MEMORY_PATH = 'simulation_data/memory.npy'
 SIMULATION_DATA_PATH = 'simulation_data/simulation.npy'
 DATA_CSV_PATH ='simulation_data/data.csv'

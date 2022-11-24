@@ -2,15 +2,22 @@ from coppeliasim import Coppeliasim
 import numpy as np
 from tqdm import tqdm
 
-from datasets import SIM_DATA_PATH,SIM_DATA_ROTATE_PATH
+from datasets import SIM_DATA_PATH,SIM_DATA_ROTATE_PATH,SIM_DATA_30MS_PATH
 
+
+N_SAMPLES = 10_000
+VEL_WHEEL_MAX =2.0
 
 def main():
 
     sim = Coppeliasim()
 
-    def run_sim_10_steps():
-        for _ in range(10):
+    def run_sim_n_steps(n:int=10):
+        """ 
+            cada step são 5 milissegundos
+            então n steps são n*5ms, n=6 => 30ms
+        """
+        for _ in range(n):
             sim.step()
 
     def reset_simulation():
@@ -18,14 +25,14 @@ def main():
         sim.reset_robot_pos()
         sim.set_Velocity(0.0, 0.0)
         sim.set_robot_random_orientation()
-        run_sim_10_steps()
+        run_sim_n_steps()
 
     sim.enable_step()
     sim.start_simulation()
     reset_simulation()
 
-    iterations = 0
-    max_iterations = 2_000
+ 
+    
 
     sim_t_1_data: list[list[float]] = list()
     sim_t_2_data: list[list[float]] = list()
@@ -38,21 +45,18 @@ def main():
 
         return robot_pos, time, theta
 
-    for iterations in tqdm(iterable=range(1, max_iterations+1)):  
+    for iterations in tqdm(iterable=range(1, N_SAMPLES+1)):  
 
         if iterations % 18 == 0:
             reset_simulation()
 
         s_1, t_1, theta_1 = read_simulation_data()
-        vel_wheels = np.random.sample((2)) * 2
-        if iterations < 1_000:
-            vel_wheels[0] = 0.0
-        elif iterations < 2_000:
-            vel_wheels[1] = 0.0
+        vel_wheels = np.random.sample((2)) * VEL_WHEEL_MAX
+        
 
         print('robot pos 1:', s_1[:2])
         sim.set_Velocity(float(vel_wheels[0]), float(vel_wheels[1]))  # type: ignore
-        run_sim_10_steps()
+        run_sim_n_steps()
         s_2, t_2, theta_2 = read_simulation_data()
         print(f'robot pos 2: {s_2[:2]} theta {theta_1} wheels {vel_wheels}')
         print('vel:', np.array(s_2)/(t_2-t_1) - np.array(s_1)/(t_2-t_1))
@@ -77,7 +81,7 @@ def main():
     sim_t_1_data = np.array(sim_t_1_data, dtype=np.float32)  # type: ignore
     sim_t_2_data = np.array(sim_t_2_data, dtype=np.float32)  # type: ignore
 
-    with open(SIM_DATA_ROTATE_PATH, 'wb') as f:
+    with open(SIM_DATA_30MS_PATH, 'wb') as f:
         np.save(f, sim_t_1_data)  # type: ignore
         np.save(f, sim_t_2_data)  # type: ignore
 

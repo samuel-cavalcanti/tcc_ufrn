@@ -14,7 +14,7 @@ def create_federico_controller() -> FredericoController:
     k_d = k_p * 0.085
     """Constantes Kp Ki Kd adquiridas experimentalmente """
     pid_position = PID(k_p, k_i, k_d, set_point=0)
-    k_p = 0.2
+    k_p = 0.4
     k_i = 0.015
     k_d = k_p * 0.00  # 474
     pid_orientation = PID(k_p, k_d, k_i, set_point=0)
@@ -42,7 +42,11 @@ def main():
     kinematic = load_kinematic().float()
     # torch.jit.script(kinematic).save('kinematic_module.pt')
 
-    def run_sim_n_steps(n: int = 5):
+    def run_sim_n_steps(n: int = 6):
+        """ 
+            cada step são 5 milissegundos
+            então n steps são n*5ms, n=6 => 30ms
+        """
         for _ in range(n):
             sim.step()
 

@@ -1,91 +1,86 @@
 import torch
 from torch import nn
-
+import numpy as np
 
 ORI_MODEL_PATH = 'test_ori.tch'
-TRANSLATE_MODEL_PATH = 'test.tch'
-
-
-class TranslateModel(nn.Module):
-
-    def __init__(self) -> None:
-        super().__init__()
-
-        self.w = nn.Linear(2, 2, bias=True)
-
-    def forward(self, vel: torch.Tensor) -> torch.Tensor:
-
-        return self.w.forward(vel)
-
-
-class OrientationLayer(nn.Module):
-
-    def __init__(self) -> None:
-        super().__init__()
-
-        self.w = nn.Linear(1, 2)
-        self.w_2 = nn.Linear(2, 2)
-
-    def forward(self, vel_ang: torch.Tensor) -> torch.Tensor:
-        alpha = self.w.forward(vel_ang)
-
-        return self.w_2.forward(alpha.sin())
+KINEMATIC_MODEL_PATH = 'test.tch'
 
 
 class Kinematic(nn.Module):
 
-    
-    # linear: nn.Module
-    # angular: nn.Module
-    
-   
-    def __init__(self, ori: nn.Module, trans: nn.Module) -> None:
+    def __init__(self) -> None:
         super().__init__()
-        self.linear = trans
-        self.angular = ori
 
-    
+        self.alpha = nn.parameter.Parameter(torch.empty((1, 2)))
+        self.beta = nn.parameter.Parameter(torch.empty((1, 2)))
+        self.l = nn.parameter.Parameter(torch.empty((1, 2)))
+        self.r = nn.parameter.Parameter(torch.empty((1, 2)))
+        # self.linear = nn.Linear(3, 2, bias=False)
+
+        nn.init.kaiming_uniform_(self.alpha, a=np.sqrt(5))
+        nn.init.kaiming_uniform_(self.beta, a=np.sqrt(5))
+        nn.init.kaiming_uniform_(self.l, a=np.sqrt(5))
+        nn.init.kaiming_uniform_(self.r, a=np.sqrt(5))
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
 
-        linear_vel = x[:, :2]
-        angular_vel = x[:, 2].reshape((-1, 1))
+        gamma = self.alpha + self.beta
 
-        linear_vel_wheel = self.linear.forward(linear_vel)
-        angular_vel_wheel = self.angular.forward(angular_vel)
+        sin_gamma = gamma.sin()
+        cos_gamma = gamma.cos()
+        l_pred_phi = -self.l * self.beta.cos()/self.r
+        
 
-        return (linear_vel_wheel + angular_vel_wheel)/2.0
+        """
+            1/r[sin ( α + β ), - cos ( α + β ), - l cos(β)] = ϕ
+        """
+        weights = torch.cat(((sin_gamma/self.r).T, (-cos_gamma/self.r).T, l_pred_phi.T), 1)
 
-    @torch.jit.ignore # type: ignore
+
+        """
+            [ cos ( α + β ), sin ( α + β ), l sin β ] = 0
+        """
+        l_pred_zero =self.l*self.beta.sin()
+        weights_2 = torch.cat((cos_gamma.T,sin_gamma.T,l_pred_zero.T),1 )
+
+
+      
+
+        w = torch.cat((weights,weights_2))
+
+
+
+
+
+        return nn.functional.linear(x, w, None)
+
+    @torch.jit.ignore  # type: ignore
     def save_model(self) -> None:
-        torch.save(self.linear.state_dict(), TRANSLATE_MODEL_PATH)
-        torch.save(self.angular.state_dict(), ORI_MODEL_PATH)
+        torch.save(self.state_dict(), KINEMATIC_MODEL_PATH)
 
-    @torch.jit.ignore # type: ignore
+    @torch.jit.ignore  # type: ignore
     def to_jit_script(self) -> None:
-        sm = torch.jit.script(self) # type: ignore
+        sm = torch.jit.script(self)  # type: ignore
         sm.save('kinematic.pt')  # type: ignore
 
 
-def load_orientation() -> nn.Module:
-    device = torch.device('cpu')
-    angular = OrientationLayer().to(device)
-    angular.load_state_dict(torch.load(ORI_MODEL_PATH))
-    return angular
-
-
-def load_translate() -> nn.Module:
-    device = torch.device('cpu')
-    linear = TranslateModel().to(device)
-    linear.load_state_dict(torch.load(TRANSLATE_MODEL_PATH))
-    return linear
-
-
 def load_kinematic() -> Kinematic:
-    # device = torch.device('cpu')
-    linear = TranslateModel()  # .to(device)
-    angular = OrientationLayer()  # .to(device)
 
-    linear.load_state_dict(torch.load(TRANSLATE_MODEL_PATH))
-    angular.load_state_dict(torch.load(ORI_MODEL_PATH))
+    model = Kinematic()
+    """
+        solução analítica da cinemática
 
-    return Kinematic(angular, linear)  # .to(device)
+        weight = torch.tensor(
+        [
+            [1/0.0825, 0, 0.30145/0.0825],
+            [1/0.0825, 0, -0.30145/0.0825],
+        ])
+
+        for param in model.parameters():
+            param.data.copy_(weight)
+    """
+
+    model.load_state_dict(torch.load(KINEMATIC_MODEL_PATH))
+    for name,param in model.named_parameters():
+        print(f'{name}:{param.data}')
+    return model
