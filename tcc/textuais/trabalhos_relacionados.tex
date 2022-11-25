@@ -238,7 +238,9 @@ aprender um sistema de entrada e saída contínua.
 Enquanto temos uma rede neural $Q$ que busca encontrar a função ação-valor ótima $Q^*$, temos uma
 nova rede neural que através do gradiente ascendente buscar encontrar a política $\mu$
 que maximiza a recompensa da função valor aproximada $Q(S,\mu(S))$. O algoritmo do \textit{Deep Deterministic Policy Gradient}
-pode ser vista no Algoritmo \ref{Deep Deterministic Policy Gradient:}
+pode ser vista no Algoritmo \ref{Deep Deterministic Policy Gradient:}. Ambos os
+algoritmos \textit{Deep Q-learning} e \textit{Deep Deterministic Policy Gradient} 
+foram retirados da documentação da \textit{OpenIA} \cite{SpinningUp2018}.
 
 \begin{algorithm}[H]
     %% \SetLine

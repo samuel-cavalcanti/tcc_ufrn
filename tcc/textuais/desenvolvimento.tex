@@ -19,7 +19,7 @@ O desenvolvimento do controlador, foi dividindo em quatro partes, a primeira
 a construção do modelo cinemático, terceira foi  modelado
 uma rede neural de modo que seus parâmetros se traduzissem nos parâmetros
 da cinemática, quarta e ultima parte conta o desenvolvimento
-do pre-processamento dos dados e treinamento do modelo. 
+do pre-processamento dos dados. 
 
 
 \section{construção do robô em um ambiente simulado}
@@ -47,7 +47,8 @@ Como dito anteriormente, o robô possui um acionamento diferencial,
 o CoppeliaSim, permite configurar os atuadores no modo controle de
 velocidade, neste modo, o cliente \textit{zmqRemoteApi} é capaz de enviar
 um sinal em radianos por segundo, a qual é aplicado instantaneamente.
-
+O modelo conta com sensores para odométrica como giroscópio e acelerômetro
+e um kinect, no entanto os sensores não foram utilizados neste trabalho.
 
 \section{Coleta de dados para o modelo cinemático}
 Tendo o robô modelado, a simulação configurada, então foi criado
@@ -92,7 +93,7 @@ global. O pseudo código pode ser observado no Algoritmo \ref{coleta:de:dados:}
                 por meio da conexão SIM
             }
         
-        armazene em $M$ os valores  ($x_1$,$y_1$,$\theta_{1}$,$t_1$),($x_2$,$y_2$,$\theta_{2}$,$t_2$)
+        armazene em $M$ os valores  $(x_1,y_1,\theta_{1},t_1,\phi_l,\phi_r),(x_2,y_2,\theta_{2},t_2)$
         
     }
 
@@ -112,7 +113,9 @@ por tanto foi adotado que velocidade linear máxima da coleta seria de
 0,165 metros por segundo, esse número foi adotado por ser significantemente,
 inferior a 0,8  e ser o dobro do raio das rodas, ou seja, na prática é gerado
 dois números aleatórios de distribuição uniforme entre 0 e 1 e multiplicado por
-2, $V_{MAX} = 2$.
+2, $V_{MAX} = 2$. O simulador retorna valores de posições $x$,$y$ em metros
+que variam de -2,5 até 2,5 metros, já a orientação do robô é medida em radianos
+que variam de $-\pi$ até $\pi$.
 
 \section{Modelagem de parâmetros de redes neurais artificiais}
 Atualmente \textit{Frameworks} de aprendizado máquina supervisionado,
@@ -224,4 +227,88 @@ onde cada peso é $W_{i,j}$ é encontrado separadamente. Ambos os modelos foram
 treinados e foram discutidos na sessão de experimentos e resultados.
 
 
-\section{pre-processamento dos dados e treinamento do modelo}
+\section{pre-processamento dos dados}
+A coleta de dados nos fornece dados de posição, orientação, velocidade angular
+das rodas do robô e tempo de simulação, portanto temos que transformar os dados
+de posição e orientação e tempo, em informação de velocidade linear e angular
+do robô, sendo que a velocidade linear tem que está no referencial do robô. O
+O pseudo código do pre-processamento pode ser observado no Algoritmo \ref{pre:processamento:}
+
+\begin{algorithm}[H]
+    \label{pre:processamento:}
+    
+    \Entrada{$F$:arquivo resultante da coleta de dados }
+    %% \SetLine
+    
+    $(x_1,y_1,\theta_{1},t_1,\phi_l,\phi_r),(x_2,y_2,\theta_{2},t_2) \leftarrow$ leitura da coleta dados dos instantes de
+    tempo $t_1$ e $t_2$
+
+    $\Delta x \leftarrow x_2 - x_1$
+    
+    $\Delta y \leftarrow y_2 - y_1$
+
+    $\Delta t \leftarrow t_2 - t_1$
+
+    $\Delta \theta \leftarrow \theta_2 - \theta_1$
+
+    \Se {$\Delta \theta > \pi$ }{
+                $\Delta \theta \leftarrow \Delta \theta -2\pi $
+    }
+
+    \Se {$\Delta \theta < -\pi$ }{
+                $\Delta \theta \leftarrow \Delta \theta +2\pi $
+    }
+
+    $\text{vel}_{\text{linear}_G} \leftarrow \frac{(\Delta x,\Delta y)}{\Delta t}$
+
+    $\text{vel}_{\text{angular}} \leftarrow \frac{\Delta \theta}{\Delta t}$
+
+
+
+    \Para {$i \leftarrow 0$ \Ate $N_a$} {
+       
+        $
+        R(\theta) \leftarrow 
+        \begin{bmatrix}
+            cos(\theta_{1,i})  & sin(\theta_{1,i})\\
+            -sin(\theta_{1,i}) & cos(\theta_{1,i})\\
+        \end{bmatrix}
+        $
+
+        $\text{vel}_{\text{linear}_{R,i}} \leftarrow R(\theta) \times \text{vel}_{\text{linear}_{G,i}}$
+    }
+    
+    entrada\_modelo\_cinemático $\leftarrow (\text{vel}_{\text{linear}_{R}},\text{vel}_{\text{angular}})$
+
+    
+    \eSe {for a entrada do modelo simples: $\phi=W \times \dot{\xi}$}{
+                    
+        saída\_modelo\_cinemático $\leftarrow (\phi_l,\phi_r)$
+      }
+      {
+        saída\_modelo\_cinemático $\leftarrow (\phi_l,\phi_r,0,0)$
+      }
+
+   
+
+      \Retorna entrada\_modelo\_cinemático, saída\_modelo\_cinemático
+    
+    \caption{Pre-processamento dos dados}
+    
+\end{algorithm}
+
+Perceba que após a leita dos dados entrada é feita uma aproximação da
+velocidade angular e linear do robô através das variação de deslocamento
+sobre variação de tempo, também ao calcular a variação da orientação do robô
+é verificado se o angulo resultante é maior que 180 ou menor que -180 graus,
+caso uma dessas duas condições forem verdade significa que $\Delta \theta$,
+é o maior angulo do circulo unitário e no caso, estamos interessados no menor
+angulo formado entre $\theta_2$ e $\theta_1$. É importante salientar que $N_a$
+é um número de amostras coletadas, este número pode ser recuperado através
+do tamanho de um dos vetores: $x_1,y_1,\theta_{1},t_1,\phi_l,\phi_r,x_2,y_2,\theta_{2},t_2$.
+Como dito anteriormente, foram testados dois modelos, um modelo mais complexo
+que envolve modelagem dos parâmetros da rede através das equações das rodas
+e outro modelo mais simples que busca encontrar uma transformação linear
+para os conjunto de dados, quando é realizado o treinamento do modelo complexo
+é adicionado mais dois vetores de zeros a saída do modelo cinemático, zeros
+que são esperados pela equação da roda. 
