@@ -93,6 +93,6 @@ fn is_goal(target_pos: &Vec<f32>, robot_pos: &Vec<f32>) -> bool {
     distance < thirty_centimeters
 }
 
-fn load_kinematic_model() -> tch::CModule {
+pub fn load_kinematic_model() -> tch::CModule {
     tch::CModule::load("assets/kinematic.pt").unwrap()
 }

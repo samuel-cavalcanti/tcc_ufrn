@@ -108,7 +108,7 @@ class Coppeliasim:
         self.__sim.setObjectPosition(
             self.__robot.handle, -1, INI_POS)
         self.__sim.setObjectOrientation(
-            self.__robot.handle, -1,INIT_ORI)
+            self.__robot.handle, -1, INIT_ORI)
 
     def set_robot_random_orientation(self):
 
@@ -151,4 +151,8 @@ class Coppeliasim:
         self.__sim.setObjectPosition(
             self.__targets.handle, -1, self.__targets.targets[self.__targets.current_pos_index])
 
-        pass
+    def get_robot_velocity(self) -> tuple[list[float], list[float]]:
+
+        lin_vel, ang_vel = self.__sim.getObjectVelocity(self.__robot.handle)
+
+        return lin_vel, ang_vel
