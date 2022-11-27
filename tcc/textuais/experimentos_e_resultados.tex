@@ -21,14 +21,18 @@ o controlador Frederico e encontrado as constantes do P.I.D empiricamente.
 \section{Experimentos com a Cinemática}
 Em todos os treinamentos dos modelos
 de rede neural artificial foi utilizado o algoritmo de otimização
-RMSprop com uma taxa de aprendizado de 0.0001, um momentum $m =0$,
+RMSprop com uma taxa de aprendizado de 0,0001, um momentum $m =0$,
 foi utilizado o \textit{Framework pytorch}, para a criação dos
-grafos computacionais e treinamento dos modelos, \textit{pytorch}
+grafos computacionais e treinamento dos modelos. \textit{Pytorch}
 permite a criação e prototipagem de um modelo de aprendizagem de
 máquina na linguagem \textit{Python} ao mesmo tempo que possui
 uma versão em C++ e \textit{Rust}, permitindo criar aplicações
-bastante performáticas. Para a criação dos modelos, executado o
-algoritmo de coleta de dados para obter um conjunto com 10 mil
+bastante performáticas. Em nosso Experimentos a execução do modelo
+em \textit{Rust} é em média 2 vezes mais rápido do que a mesma implementação
+em \textit{Python}, para se chegar a esse número foi executado 10 mil vezes o cálculo
+da cinemática, em um \textit{notebook} com processador de 4 núcleos \textit{AMD Ryzen 5 2500U},
+sem placa de vídeo dedicada. Para a criação dos modelos foi executado o
+algoritmo de coleta de dados obtendo conjunto com 10 mil
 pontos, durante o treinamento é dividido este conjunto de dados
 onde 60\% dos dados é utilizado para treinamento e 40\% é utilizado
 apenas para avaliação, ou seja, a rede não possui informação sobre esses
@@ -52,17 +56,221 @@ foi o erro quadrático médio.
     \caption{Erro Médio quadrático regressão linear}
 \end{figure}
 
+Para teste dos modelos cinemáticos foi coletado mais 10 mil pontos,
+mas dessa vez com o robô podendo variar a velocidade angular das rodas
+para até 5 vezes o raio da roda, ou seja $V_{MAX}=5$, no entanto ao invés
+de coletar dados de posição, foi extraído do simulador diretamente a
+velocidade do robô.
+
+\begin{figure}[H]
+    \label{fig:conj:dados}
+    \centering
+    \includegraphics[scale=0.3]{figuras/conj_dados.pdf}
+    \caption{Comparação entre os conuntos de dados}
+\end{figure}
+
+Podemos observar que na figura \ref{fig:conj:dados} que o conjunto
+de dados para treinamento e avaliação do modelo 
+é um sub conjunto do conjunto de testes. Foi calculado o erro quadrático
+médio dos modelos em relação ao conjunto de testes gerando a
+tabela \ref{table:mse:test}
+
 
 \begin{table}[H]
+    \label{table:mse:test}
     \centering
     \begin{tabular}{c|c}
         \hline
         Erro quadrático médio & modelo \\
         \hline
-        0.0013 & modelo regressão linear \\
+        0,0037 & modelo regressão linear \\
         \hline
-        0.0006 & modelo regressão não linear \\
+        0,0032 & modelo regressão não linear \\
+        \hline
+        0,0027 & modelo analítico \\
         \hline
     \end{tabular}
-    \caption{Avaliação dos modelos}
+    \caption{teste dos modelos}
 \end{table}
+
+Como se sabe o significado físico dos parâmetros do modelos gerados
+através de algoritmos de aprendizado de máquina, então na figura
+\ref{fig:parametros:da:cinemantica} mostra os valores encontrados
+sendo $W_{A}$ a resposta do calculo analítico, $W_{K}$ a resposta
+através da regressão não linear e $W_{L}$ a resposta da regressão
+linear. A tabela \ref{table:param:kinematic} mostra os valores
+dos parâmetros das rodas após a regressão não linear, e a tabela
+\ref{table:param:analytic} mostra os valores dos parâmetros da
+solução analítica, em ambas as tabelas os ângulos estão medidos
+em graus, e os raio da roda $r$ e distância $l$ estão em metros.
+ 
+
+\begin{figure}[H]
+    \label{fig:parametros:da:cinemantica}
+    \begin{align*}
+        W_{A} = 
+        \begin{bmatrix}
+            12,1212 &  0,0000 & 3,5307 \\
+            12,1212 &  0,0000 & -3,5307 \\
+        \end{bmatrix}\\
+        W_{K} = 
+        \begin{bmatrix}
+            12,2294 &  -0,0291 & 3,7330 \\
+            12,1241 &  -0,1347 & -3,5121
+        \end{bmatrix}\\
+        W_{L} = 
+        \begin{bmatrix}
+            12.2262 &  -1.3070 & 3.5472 \\
+            12.1198 &  -4.4313 & -4.1472
+        \end{bmatrix}\\
+    \end{align*}
+    \caption{Modelos cinemáticos}
+\end{figure}
+
+\begin{table}[H]
+    \label{table:param:kinematic}
+    \centering
+    \begin{tabular}{c|c|c|c|c}
+        \hline
+         $\alpha$ &$\beta$ &$l$ &$r$ & roda \\
+        \hline
+        115,6515 &-25,8002 &-0,3389 &0,0818 & roda esquerda \\
+        \hline
+        62,3091  &27,1352 &0,3254 &0,0825 & roda direita \\
+        \hline
+    \end{tabular}
+    \caption{parâmetros das rodas após a regressão não linear}
+\end{table}
+Perceba que o angulo $\gamma$ do modelo gerado pela regressão não
+linear foi de $\gamma_{k_1} = 115,6515 -25,8002  = 89.8513$ e 
+$\gamma_{k_2} = 62,3091 +27,1352 = 89.4443$
+\begin{table}[H]
+    \label{table:param:analytic}
+    \centering
+    \begin{tabular}{c|c|c|c|c}
+        \hline
+         $\alpha$ &$\beta$ &$l$ &$r$ & roda \\
+        \hline
+        0 & 90 &-0,2912 &0,0825 & roda esquerda \\
+        \hline
+        180  &-90 & 0,2912 &0,0825 & roda direita \\
+        \hline
+    \end{tabular}
+    \caption{parâmetros das rodas modelo analítico}
+\end{table}
+
+
+Como dito anteriormente foi utilizado o controlador Frederico,
+cujo os parâmetros dos P.I.Ds foram conseguidos empiricamente,
+visando minimizar o sobre-sinal do controlador de velocidade linear,
+os valores podem ser vistos na tabela \ref{table:pid:}.
+
+\begin{table}[H]
+    \label{table:pid:}
+    \centering
+    \begin{tabular}{c|c|c|c}
+        \hline
+        P & I & D & tipo de controlador \\
+        \hline
+        0,05145 & 0,01769 & 0,60529 & velocidade linear \\
+        \hline
+        0,4 & 0,015 & 0 & velocidade angular \\
+        \hline
+    \end{tabular}
+    \caption{parâmetros P.I.D}
+\end{table}
+
+Para avaliar o sistema de controle, com os diferentes modelos
+cinemática, foi posicionado um alvo e observado o robô no seu
+trabalho em chegar até alvo mensurando a distância do robô até
+o alvo e o seu angulo, essas duas medidas foram escolhidas pois 
+estes são os valores a serem minimizados pelo controlador Frederico,
+ao todo o alvo foi posicionado em quatro lugares diferentes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{figuras/robo_e_alvo.png}
+    \caption{Robô e alvo}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{figuras/distance_over_time_1.pdf}
+    \hspace{1cm}
+    \includegraphics[scale=0.3]{figuras/angle_over_time_1.pdf}
+    \caption{Angulo e distância observada no alvo 1}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{figuras/distance_over_time_2.pdf}
+    \hspace{1cm}
+    \includegraphics[scale=0.3]{figuras/angle_over_time_2.pdf}
+    \caption{Angulo e distância observada no alvo 2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{figuras/distance_over_time_3.pdf}
+    \hspace{1cm}
+    \includegraphics[scale=0.3]{figuras/angle_over_time_3.pdf}
+    \caption{Angulo e distância observada no alvo 3}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{figuras/distance_over_time_4.pdf}
+    \hspace{1cm}
+    \includegraphics[scale=0.3]{figuras/angle_over_time_4.pdf}
+    \caption{Angulo e distância observada no alvo 4}
+\end{figure}
+
+\section{Discussão dos Experimentos}
+Na observação do robô em seu trabalho de chegar até o alvo, os modelos
+obtidos através da regressão linear e não linear tiveram respostas
+idênticas ao modelo cinemático, também na tabela do erro quadrático médio \ref{table:mse:test},
+os valores ficaram nas mesmas casas decimais, através desses dois fatos
+podemos dizer que os modelos são equivalentes, outro ponto interessante é
+observar a generalização do modelos, uma vez que o conjunto do treinamento
+é um sub conjunto do conjunto de testes o que nos dá segurança em aplicar
+o modelo em dados nunca vistos, em aprendizado de máquina supervisionada
+muitas vezes é feito uma escolha em generalização e otimização, onde um
+modelo mais otimizado ao conjunto de dados de treinamento tende a não ir
+bem e dados fora desse conjunto, no entanto ao modelarmos o sistema cinemático
+do robô ao mesmo tempo que modelamos os pesos de uma rede neural artificial,
+mostramos que otimizar os parâmetros de uma rede neural modelada ao sistema,
+estamos também aumentando a sua generalização, também demostramos através do
+modelo que busca encontrar os parâmetros da equações de cinemática
+que a relação dos pesos com os dados não precisa ser linear. Comparando
+os modelos de aprendizado, podemos observar que a regressão linear durou
+cento e sessenta mil iterações, já a regressão não linear parou de reduzir
+o erro com trinta mil iterações, apesar do tempo de treinamento está
+fortemente relacionado om os valores iniciais da rede, a regressão não
+linear teve mais duas equações iguais a zero que ajudou a guiar o erro
+mais rápido. Outro ponto interessante de se notar na figura \ref{fig:parametros:da:cinemantica}
+que os pesos da regressão linear afirmam existir uma contribuição negativa
+de velocidade linear no eixo y do robô, algo também observado no modelado de
+regressão não linear, só que com valores inferiores devido as equações,
+talvez estes valores deve-se a aproximação da velocidade por meio da variação
+de posição sobre variação do tempo ou algum fator dinâmico da simulação.
+Comparando os valores das tabelas \ref{table:param:kinematic} e \ref{table:param:analytic}
+podemos perceber que a rede convergiu o angulo $\gamma = \alpha + \beta$,
+uma vez que o gamma analítico é  $\gamma_{A} = 90$ e o gamma do modelo
+de regressão não linear foi de $\gamma_{K} = 89$, o modelo de aprendizado
+de máquina é resultado dos seus dados como existe uma pena velocidade em
+y, do robô, a rede reajustou os parâmetros $l$ e $\beta$ de modo que
+representa-se os dados, apensar do modelo não ter encontrado os ângulos,
+$\beta, \alpha$ próximos da solução analítica, os raios da rodas estão
+com valores muito próximos e a distância $l$ está a uma diferença de
+centímetros da solução analítica. Este trabalho também buscar uma solução
+que pode-se sem implementada em um computador com limitação de
+processamento e memória,então se consideramos que o treinamento poder ser
+realizado em outro computador, onde o robô enviaria os dados,
+por tanto o computador apenas executará o algoritmo do  P.I.D mais a
+multiplicação de uma matriz da cinemática que contem 6 elementos, então
+o computador utilizado não irá precisar de muita memória e processamento,
+sendo a parte mais crítica o armazenamento de um buffer durante o algoritmo
+da coleta de dados, outro pronto crítico seria o tempo de bateria durante
+a coleta de dados, mas considerando que um ciclo de controle esta por volta
+de 30ms, portanto para coletar 10 mil amostras equivale a 300 segundos, ou
+seja, pro volta de 5 minutos.
