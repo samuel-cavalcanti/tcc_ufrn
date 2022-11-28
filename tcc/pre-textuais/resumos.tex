@@ -11,7 +11,52 @@
 % primeira página do capítulo, mesmo que o estilo que estejamos usando
 % para numeração seja outro.
 \mychapterast{Resumo}
-Com 
+Um Andador Robótico Inteligente (Smart Walker) foi criado por Alberto Tavares
+de Oliveira, com objetivo de ajudar pessoas com mobilidade reduzida, apesar
+da construção do andador inteligente não foi feio um sistema de controle para o
+robô, o principal objetivo deste trabalho é criar um  sistema de
+controle para o andador inteligente que seja capaz de posicionar o robô
+em uma determinada posição, também devido ao sucesso  em utilizar
+aprendizado de máquina para resolver jogos como o sistema alphazero e muzero,
+este trabalho visa estudar e avaliar algoritmos de aprendizado de máquina
+na elaboração do controlador, primeiro foi feito um levantamento
+literário sobre a utilização aprendizado de máquina para criação de
+controladores cinemáticos em robôs moveis de acionamento diferencial,
+segundo foi construído uma versão do robô no simulador Coppeliasim,
+a qual foi utilizando para a avaliação do controlador, terceiro foi projetado
+um controlador cinemático, onde dois modelos cinemáticos
+foram obtidos através da modelagem dos parâmetros de uma rede neural
+artificial utilizando as equações que limitam o movimento cinemático do robô,
+os dados utilizados para o treinamento da rede neural são obtidos
+através dos algoritmos de coleta de dados e pre-processamento,
+onde na coleta de dados o robô se move aleatoriamente com
+uma velocidade angular das rodas máxima $V_{MAX}=2$
+enquanto se é coletado dados de posição, orientação do robô,
+velocidade angulares das rodas e tempo, no pre-processamento, a posição,
+orientação e tempo são transformados em velocidades lineares e angulares
+do robô. Já no controlador foi utilizado uma abordagem clássica feita por
+Frederico Carvalho Vieira que utiliza dois controladores
+Proporcionais, integrais, derivativos (P.I.D), um P.I.D é
+responsável por enviar sinais de velocidade linear
+e outro P.I.D é responsável por enviar sinais de velocidade angular, os parâmetros
+de ambos os P.I.Ds foram obtidos empiricamente, para avaliar os modelos cinemáticos
+foi calculado o modelo analítico e coletado mais dez mil amostras com a diferença que a
+velocidade máxima $V_{MAX}=5$ e que ao invés de coletarmos dados de posição,
+é extraído a velocidade do robô diretamente, através das dez mil amostras
+foi calculado o erro quadrático médio para todos os modelos cinemáticos,
+para avaliar todo o sistema foi posicionado um alvo e observado o robô no seu
+trabalho em chegar até alvo mensurando a distância do robô até o alvo e o seu
+angulo sobre o tempo, o alvo foi posicionado em 4 lugares diferentes.
+Foi concluído durante o levantamento literário que utilizar a abordagem
+clássica é a melhor opção devido ao fato que as soluções com
+aprendizado de máquina usam muito mais memória, processamento e
+apresentam resultados equiparáveis quando não piores que as soluções
+utilizando leis clássicas de controle. Foi concluído que o modelo cinemático
+analítico e os outros dois modelos são equivalentes, devido o erro quadrático
+médio estarem na mesmas casas decimais e que na tarefa do robô chegar até o alvo
+os gráficos de distância sobre o tempo e angulo sobre o tempo tiveram gráficos
+iguais. Foi concluído que 
+
 
 
 \vspace{1.5ex}
