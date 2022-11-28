@@ -23,79 +23,57 @@ com as velocidades das rodas.
 \end{figure}
 
 A cinemática de um robô móvel está fortemente relaciona a modelagem
-das rodas do robô, de forma geral chega-se os seguintes sistemas
-afim: $L_r\times v_r +B_r = \phi_r$ e $K_r \times v_r + C_r = 0$
+das rodas do robô, para um robô com duas rodas de acionamento diferencial
+as equações que regem o movimento são:
 
 \[
 \begin{bmatrix}
-    A_{11}sen(W_{11}\alpha_{11} + \beta_{11}) &  A_{12}sen(W_{12}\alpha_{12} + \beta_{12}) &  A_{13}sen(W_{13}\alpha_{13} + \beta_{13})\\
-    A_{21}sen(W_{21}\alpha_{21} + \beta_{21}) &  A_{22}sen(W_{22}\alpha_{22} + \beta_{22}) &  A_{23}sen(W_{23}\alpha_{23} + \beta_{23})\\
-    \vdots & \vdots & \vdots \\
-    A_{n1}sen(W_{n1}\alpha_{n1} + \beta_{n1}) &  A_{n2}sen(W_{n2}\alpha_{n2} + \beta_{n2}) &  A_{n3}sen(W_{n3}\alpha_{n3} + \beta_{n3})\\
+    \sin(\alpha_{1} + \beta_{1}) &  -\cos(\alpha_{1} + \beta_{1}) &  -l_1\cos(\beta_{1})\\
+    \sin(\alpha_{2} + \beta_{2}) &  -\cos(\alpha_{2} + \beta_{2}) &  -l_2\cos(\beta_{2})\\
 \end{bmatrix}
 \begin{bmatrix}
     v_x \\
     v_y \\
     \omega\\
 \end{bmatrix}
-+
-\begin{bmatrix}
-    B_0 \\
-    B_1 \\
-    \vdots \\
-    B_n \\
-\end{bmatrix}
 =
 \begin{bmatrix}
-    \phi_0 \\
-    \phi_1 \\
-    \vdots \\
-    \phi_n \\
+    r_0\phi_0 \\
+    r_1\phi_1 \\
 \end{bmatrix}
 \]
-\newpage
+
 
 \[
 \begin{bmatrix}
-    D_{11}sen(Q_{11}\gamma_{11} + \mu_{11}) &  D_{12}sen(Q_{12}\gamma_{12} + \mu_{12}) &  D_{13}sen(Q_{13}\gamma_{13} + \mu_{13})\\
-    D_{21}sen(Q_{21}\gamma_{21} + \mu_{21}) &  D_{22}sen(Q_{22}\gamma_{22} + \mu_{22}) &  D_{23}sen(Q_{23}\gamma_{23} + \mu_{23})\\
-    \vdots & \vdots & \vdots \\
-    D_{n1}sen(Q_{n1}\gamma_{n1} + \mu_{n1}) &  D_{n2}sen(Q_{n2}\gamma_{n2} + \mu_{n2}) &  D_{n3}sen(Q_{n3}\gamma_{n3} + \mu_{n3})\\
+    \cos(\alpha_{1} + \beta_{1}) &  \sin(\alpha_{1} + \beta_{1}) &  l_n\sin(\beta_{1}) \\
+    \cos(\alpha_{2} + \beta_{2}) &  \sin(\alpha_{2} + \beta_{2})  &  l_n\sin(\beta_{2})\\
 \end{bmatrix}
 \begin{bmatrix}
     v_x \\
     v_y \\
     \omega\\
 \end{bmatrix}
-+
-\begin{bmatrix}
-    C_0 \\
-    C_1 \\
-    \vdots \\
-    C_n \\
-\end{bmatrix}
 =
 \begin{bmatrix}
     0 \\
     0 \\
-    \vdots \\
-    0 \\
 \end{bmatrix}
 \]
-onde $A$, $D$, $W$, $Q$, $B$, $C$, $\alpha$, $\gamma$, $\beta$, $\mu$
-são propriedades das rodas do robô. $v_x$,$v_y$ são as velocidade lineares
-do robô  e $\omega$ é a velocidade angular do robô.  É importante salientar
-que os parâmetros das rodas são extraídos seguindo o referencial do robô $X_r$,$Y_r$.
-Caso a velocidade linear do robô for medida em outro referencial, é necessário
-fazer uma rotação do referencial medido para a orientação do robô
+onde $\alpha$, $\beta$, $l$,$r$ são propriedades das rodas do robô, $v_x$,$v_y$
+são as velocidade lineares, $\omega$ é a
+velocidade angular do robô e $phi$ são as velocidades angulares das rodas.
+É importante salientar que os parâmetros das
+rodas são extraídos seguindo o referencial do robô $X_r$,$Y_r$ assim como
+as velocidades. Caso a velocidade linear do robô for medida em outro
+referencial, é necessário fazer uma rotação do referencial
+medido para a orientação $X_r$,$Y_r$.
 \begin{figure}[H]
     \centering
     % \includegraphics[scale=0.9]{figuras/robo.png}
     \includegraphics[scale=0.3]{figuras/robo_coordenadas.png}
-    \caption[]{Mudança de referencial}
-\end{figure}
-
-\[
+   
+    \[
     \begin{bmatrix}
         v_x \\
         v_y \\
@@ -113,41 +91,36 @@ fazer uma rotação do referencial medido para a orientação do robô
         \omega
     \end{bmatrix}
 \]
+\caption[]{Mudança de referencial}
+\end{figure}
+
+
 
 onde $v_{x_I}, v_{y_I}$, são as velocidades no referencial $X_I,Y_I$.
-\newpage
-
-No nosso caso, o robô a ser modelado possui quatro rodas, duas delas são
-rodas tratore e as outras duas rodas, são rodas castores. Apesar das rodas
-castores, contribuírem para o movimento, elas não restringem o movimento,
-portanto podemos entender o modelo cinemático do nosso robô como sendo
-uma transformação afim $W \times X + B = Y$, onde $X$ são as entradas
-do nosso modelo cinemático, $W$ e $B$ são parâmetros das
-rodas que devido a modelagem e a construção do robô, são parâmetros
-constantes. No nosso robô, caso queremos calcular a cinemática direta
-a entrada $X$ são as velocidades das rodas do robô e $Y$ a velocidade
-linear e angular do robô, caso queiramos calcular a cinemática inversa
-do robô, $X$ são as velocidades lineares e a velocidade angular do robô
-e $Y$ as velocidades da rodas. Neste trabalho visamos criar um controlador
-para o robô e como o controlador enviará um sinal de velocidade linear
-e angular para a cinemática, portanto queremos a cinemática inversa
-do nosso robô.
-
+No nosso caso o robô a ser modelado possui quatro rodas, duas delas são
+rodas de acionamento diferencial e as outras duas rodas são rodas castores.
+Apesar das rodas castores, contribuírem para o movimento, elas não restringem
+o movimento, portanto podemos entender o modelo cinemático do nosso robô
+como sendo uma transformação linear $W \times X = Y$, onde $X$ é o vetor
+de velocidades, e $W$ a matriz de valores obtidas após resolver as equações
+encontrando os parâmetros das rodas que são valores constantes.
+% No nosso robô,
+% caso queremos calcular a cinemática direta a entrada $X$ são as
+% velocidades das rodas do robô e $Y$ a velocidade linear e angular do
+% robô, caso queiramos calcular a cinemática inversa do robô, $X$ são
+% as velocidades lineares e a velocidade angular do robô e $Y$ as velocidades
+% da rodas. Neste trabalho visamos criar um controlador para o robô e
+% como o controlador enviará um sinal de velocidade linear e angular
+% para a cinemática, portanto queremos a cinemática inversa do nosso robô.
+% 
 \begin{figure}[H]
     \[
+        \begin{bmatrix}
+            v_x & v_x & \omega \\
+        \end{bmatrix}
     \begin{bmatrix}
         W_{11} &  W_{12} & W_{13} \\
         W_{21} &  W_{22} & W_{23} \\
-    \end{bmatrix}
-    \begin{bmatrix}
-        v_x \\
-        v_x \\
-        \omega \\
-    \end{bmatrix}
-    +
-    \begin{bmatrix}
-        B_{1} \\
-        B_{2} \\
     \end{bmatrix}
     =
     \begin{bmatrix}
