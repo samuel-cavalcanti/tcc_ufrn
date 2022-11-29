@@ -8,13 +8,15 @@
 \section{O problema da cinemática de um robô móvel}
 Dado um robô de acionamento diferencial, onde a velocidade
 angular das $n$ rodas são: $\phi_0,\phi_1,\phi_2,...,\phi_n$.
-Uma cinemática direta $f$ de um robô móvel é a uma função que mapeia as velocidades
+Uma cinemática direta $f$ de um robô móvel é a uma função que mapeia as
+velocidades
 angulares das rodas para a velocidade linear $v$ e velocidade angular $\omega$
 do robô, $f(\phi_0,\phi_1,\phi_2,...,\phi_n) \rightarrow v,\omega$. Já
 a cinemática inversa $g$, mapeia a velocidade angular e linear do robô para, um
 conjunto de velocidades angulares das rodas, $g(v,\omega) \rightarrow  \phi_0,\phi_1,\phi_2,...,\phi_n$.
-cinemática é portanto um conjunto de regras que relaciona a velocidade linear e angular
-com as velocidades das rodas.
+cinemática é portanto um conjunto de regras que relaciona a velocidade
+linear $v$ e angular $\omega$
+com as velocidades das rodas $\phi$.
 
 \begin{figure}[H]
     \centering
@@ -60,9 +62,8 @@ as equações que regem o movimento são:
     0 \\
 \end{bmatrix}
 \]
-onde $\alpha$, $\beta$, $l$,$r$ são propriedades das rodas do robô, $v_x$,$v_y$
-são as velocidade lineares, $\omega$ é a
-velocidade angular do robô e $phi$ são as velocidades angulares das rodas.
+onde $\alpha$, $\beta$, $l$,$r$ são propriedades das rodas do robô,
+$v_x$,$v_y$ são as velocidade lineares do eixo x,y.
 É importante salientar que os parâmetros das
 rodas são extraídos seguindo o referencial do robô $X_r$,$Y_r$ assim como
 as velocidades. Caso a velocidade linear do robô for medida em outro
@@ -102,8 +103,8 @@ rodas de acionamento diferencial e as outras duas rodas são rodas castores.
 Apesar das rodas castores, contribuírem para o movimento, elas não restringem
 o movimento, portanto podemos entender o modelo cinemático do nosso robô
 como sendo uma transformação linear $W \times X = Y$, onde $X$ é o vetor
-de velocidades, e $W$ a matriz de valores obtidas após resolver as equações
-encontrando os parâmetros das rodas que são valores constantes.
+de velocidades, e $W$ a matriz de valores constantes obtidas após resolver
+as equações.
 % No nosso robô,
 % caso queremos calcular a cinemática direta a entrada $X$ são as
 % velocidades das rodas do robô e $Y$ a velocidade linear e angular do
@@ -115,12 +116,14 @@ encontrando os parâmetros das rodas que são valores constantes.
 % 
 \begin{figure}[H]
     \[
-        \begin{bmatrix}
-            v_x & v_x & \omega \\
-        \end{bmatrix}
     \begin{bmatrix}
         W_{11} &  W_{12} & W_{13} \\
         W_{21} &  W_{22} & W_{23} \\
+    \end{bmatrix}
+    \begin{bmatrix}
+        v_x \\
+        v_x \\
+        \omega \\
     \end{bmatrix}
     =
     \begin{bmatrix}
@@ -142,8 +145,8 @@ encontrando os parâmetros das rodas que são valores constantes.
 Usualmente quando programamos computadores para
 resolver determinada tarefa, nos codificamos as regras e
 executamos o programa com os dados de entrada, esta é a abordagem clássica
-de se resolver um problema. Uma outra forma de usar computadores
-é criar sistemas como aprendizado máquina, onde nós possuímos os
+de se resolver um problema. Uma outra abordagem
+é criar sistemas de aprendizado máquina, onde nós possuímos os
 dados de entrada necessários, as respontas e queremos que a máquina retorne
 para nós quais são as regras que transformam os dados nas respostas
 desejadas \cite{chollet2021deep}.
@@ -213,7 +216,7 @@ que  $\sqrt{v_{\text{vel}_t}}$ seja zero ou bem próximo disso então para não 
 divida por zero é adicionado uma variável $\epsilon =10^{-8}$, deixando o algoritmo numericamente
 mais estável. Em contexto de aprendizado supervisionado a função $L$ é uma função erro que a
 partir do Backpropagation, encontra-se os gradientes dos parâmetros de um modelo a partir
-de pontos $X$ e $Y$ coletados, partindo de  uma definição de um modelo como por exemplo uma
+de pontos $X$ e $Y_{\text{true}}$ coletados, partindo de  uma definição de um modelo como por exemplo uma
 transformação geométrica $Y_{\text{pred}}= A \times X + B$, e uma definição de uma função
 erro como: $L=(Y_{\text{true}}- Y_{\text{pred}})^2$ podemos utilizar o algoritmo
 Backpropagation para encontrar os gradientes da função $L$ em relação a $A$
@@ -242,7 +245,7 @@ e buscam enviar sinais de velocidade linear e angular com o objetivo
 de minimizar o erro entre o estado atual e desejado. Neste trabalho
 foi utilizado um controlador de retroalimentação criado por Frederico
 \cite{vieira2006controle}, o controlador recebe como entrada a posição
-x,y $p_c$, orientação $\theta_c$ atual do robô e uma posição desejada $p_d$
+$p_c$  no plano x,y , orientação $\theta_c$ atual do robô e uma posição desejada $p_d$
 e enviar sinais de velocidade linear $v$ e angular $\omega$ com o
 objetivo de estabilizar o robô no ponto desejado.
 
@@ -276,13 +279,11 @@ segundo é calculado suas coordenadas polares $l$, $\alpha$:
 \[
     l = \sqrt{p_{\text{diff}_x}^2 + p_{\text{diff}_y}^2}
 \]
-
+onde $p_{\text{diff}_x}$,$p_{\text{diff}_y}$ são as coordenadas x,y
+do vetor $p_{\text{diff}}$.  Terceiro é calculado o angulo $\gamma$:
 \[
     \alpha =  \arctan(\frac{ p_{\text{diff}_y}}{p_{\text{diff}_x}}) 
 \]
-
-onde $p_{\text{diff}_x}$,$p_{\text{diff}_y}$ são as coordenadas x,y
-do vetor $p_{\text{diff}}$. Terceiro é calculado o angulo $\gamma$:
 
 \[
     \gamma =  \alpha - \theta
@@ -293,7 +294,7 @@ por fim o controlador P.I.D de velocidade
 linear, buscar enviar um sinal $v$ que para tender o valor $l \cos(\gamma)$
 a zero e o controlador de velocidade angular busca enviar um sinal $\omega$
 para  tender o valor de $\gamma$ a zero. perceba que quando o valor de $\gamma$
-chega próximo a zero, da velocidade linear vai tender a reduzir a
+tende a zero, da velocidade linear vai tender a reduzir apenas
 distância $l$. Como o modelo cinemático do robô espera receber como entrada
 um vetor de velocidade linear em coordenadas cartesianas então é preciso
 transformar de volta a velocidade $v$ 

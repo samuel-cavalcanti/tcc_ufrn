@@ -31,7 +31,7 @@ que se comunica com o simulador, \textit{Rust} foi adotado pois
 é capaz de produzir um código tão performático quando C/C++, além
 de possui um gerenciador de pacotes que facilita o desenvolvimento
 futuro de novas aplicações e reutilização de códigos. O ambiente
-da simulação é possui o formato quadro com um lado $l$ de 5 metros,
+simulado possui o formato quadro com um lado $l$ de 5 metros,
 além do robô, o ambiente possui um alvo, a qual o robô deve-se ir
 atrás dele, o alvo é um objeto que pode ser movido com mouse. 
 
@@ -48,7 +48,9 @@ o CoppeliaSim, permite configurar os atuadores no modo controle de
 velocidade, neste modo, o cliente \textit{zmqRemoteApi} é capaz de enviar
 um sinal em radianos por segundo, a qual é aplicado instantaneamente.
 O modelo conta com sensores para odométrica como giroscópio e acelerômetro
-e um kinect, no entanto os sensores não foram utilizados neste trabalho.
+e um kinect, no entanto os sensores não foram utilizados neste trabalho,
+foi utilizado funções do próprio simulador para coletar posição e 
+orientação do robô em relação ao referencial global.
 
 \section{Coleta de dados para o modelo cinemático}
 Tendo o robô modelado, a simulação configurada, então foi criado
@@ -122,8 +124,11 @@ Atualmente \textit{Frameworks} de aprendizado máquina supervisionado,
 tem evoluído bastante, uma das principais técnicas que revolucionou a
 área de aprendizado de máquina é uma estrutura de dados chamada grafo
 computacional, ele é o um grafo direcionado e acíclico de operações com
-tensores. A figura \ref{fig:grafo:computacional} foi retirada do livro
-\cite{chollet2021deep}.
+tensores, onde um nó pode ser um tensor ou uma função que opera sobre
+tensores. A figura \ref{fig:grafo:computacional} é um exemplo de
+grafo computacional que foi retirada do livro \cite{chollet2021deep},
+onde $x$ e $y_{true}$ são as variáveis de entrada, e $w$ $b$ são
+os parâmetros da rede neural artificial. 
 
 \begin{figure}[H]
     \label{fig:grafo:computacional}
@@ -131,8 +136,7 @@ tensores. A figura \ref{fig:grafo:computacional} foi retirada do livro
     \includegraphics[scale=0.5]{figuras/grafo_computacional.png}
     \caption{Grafo computacional}
 \end{figure}
-Onde $x$ e $y_{true}$ são as variáveis de entrada, e $w$ $b$ são
-os parâmetros da rede neural artificial. 
+
 Sabendo que cada uma das duas rodas sequem as equações:
 \begin{align}
     \frac{1}{r}
@@ -149,7 +153,7 @@ Sabendo que cada uma das duas rodas sequem as equações:
 \end{align}
 Através dessa estrutura de dados e das equações, foi
 modelado os parâmetros de uma rede neural artificial,
-onde $\alpha$,$\beta$,$r$,$l$ são parâmetros da rede neural,
+onde $\alpha$,$\beta$,$r$,$l$ são seus parâmetros,
 $\dot{\xi}$ a entrada do modelo e $\phi$ e $0$  são a saídas desejadas.
 O grafo computacional com essas operações são representadas por essas equações:
 
@@ -220,7 +224,9 @@ o valor desejado são as velocidades angulares $\phi_1,\phi_2$ das rodas:
 
 Na prática estamos fazendo uma regressão não linear para encontrar
 os parâmetros de uma transformação linear, então podemos também pensar em
-grafo de computacional mais simples, que encontra  a melhor transformação
+grafo de computacional mais simples semelhante a
+figura \ref{fig:grafo:computacional} mas sem o parâmetros $b$, 
+que encontra a melhor transformação
 linear que satisfaça o conjunto de dados coletados,
 Neste caso podemos modelar o grafo de maneira mais simples: $\phi=W \times \dot{\xi}$,
 onde cada peso é $W_{i,j}$ é encontrado separadamente. Ambos os modelos foram
@@ -300,10 +306,8 @@ O pseudo código do pre-processamento pode ser observado no Algoritmo \ref{pre:p
 Perceba que após a leita dos dados entrada é feita uma aproximação da
 velocidade angular e linear do robô através das variação de deslocamento
 sobre variação de tempo, também ao calcular a variação da orientação do robô
-é verificado se o angulo resultante é maior que 180 ou menor que -180 graus,
-caso uma dessas duas condições forem verdade significa que $\Delta \theta$,
-é o maior angulo do circulo unitário e no caso, estamos interessados no menor
-angulo formado entre $\theta_2$ e $\theta_1$. É importante salientar que $N_a$
+é verificado se a diferença angular resultante $\Delta \theta$ é a menor.
+ É importante salientar que $N_a$
 é um número de amostras coletadas, este número pode ser recuperado através
 do tamanho de um dos vetores: $x_1,y_1,\theta_{1},t_1,\phi_l,\phi_r,x_2,y_2,\theta_{2},t_2$.
 Como dito anteriormente, foram testados dois modelos, um modelo mais complexo
@@ -311,4 +315,4 @@ que envolve modelagem dos parâmetros da rede através das equações das rodas
 e outro modelo mais simples que busca encontrar uma transformação linear
 para os conjunto de dados, quando é realizado o treinamento do modelo complexo
 é adicionado mais dois vetores de zeros a saída do modelo cinemático, zeros
-que são esperados pela equação da roda. 
+que são esperados pelas equações das rodas. 

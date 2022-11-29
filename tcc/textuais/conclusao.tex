@@ -9,21 +9,14 @@ Este trabalho visou aplicar e avaliar sistemas de aprendizado de máquina
 na construção de um controlador para um robô móvel de acionamento diferencial
 que ajuda pessoas com mobilidade reduzida. Inicialmente foi feito uma
 revisão bibliográfica onde concluímos que sistemas de aprendizado de
-máquina para cenário simples semelhante a este trabalho conseguiu
-controlar o robô porem com resultados piores ou muito próximos ao
-controladores clássicos, portanto foi utilizado o controlador Frederico.
-Em relação a cinemática do robô podemos concluir que apenas com o
-conhecimento das equações, podemos modelar um grafo computacional
-que encontre os parâmetros das equações e que o modelo gerado teve
-uma resposta equivalente ao modelo analítico. Podemos concluir que
-uma vez treinado a abordagem utiliza pouca memória, sendo
-a coleta de dados o momento mais crítico em relação a memória porém
-se o ciclo da aplicação dura por volta 30ms então a coleta de dados
-de 10 mil pontos dura 5 minutos, portanto se tivermos memória 
-é variável a coleta. Por fim podemos concluído que resolver o problema
-da forma clássica, ou seja resolvendo a cinemática do modelo e criando
-um controlador através de P.I.D é a forma mais simples de resolver o
-problema e que modelar os parâmetros de uma rede neural artificial,
-através da teoria de modelagem de sistemas demostrou que é possível
-gerar um modelo que equivale ao modelo analítico, encontrando através
-de dados os parâmetros. 
+máquina que substitui um controlador clássico não é uma boa abordagem,
+considerando um cenário simples como foi apresentado neste trabalho,
+portanto foi utilizado o controlador Frederico. 
+Podemos concluir que uma vez treinado a abordagem utiliza pouca memória,
+sendo a coleta de dados o momento mais crítico. Por fim podemos concluir
+que resolver o problema da forma clássica, ou seja resolvendo a cinemática
+do modelo e criando um controlador clássico é a forma mais simples
+de resolver o problema, no entanto com apenas com o conhecimento das equações,
+podemos modelar um grafo computacional que encontre os parâmetros das
+equações de modo que a solução equivale ao modelo analítico, um fato
+interessante que precisa ser melhor investigado.
