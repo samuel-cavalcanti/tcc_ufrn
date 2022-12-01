@@ -25,17 +25,14 @@ rede neural artificial utilizando as equações que limitam o movimento
 cinemático do robô, um modelo faz uma regressão não linear dos
 parâmetros das equações, já outro modelo realiza uma regressão linear.
 Os dados utilizados para o treinamento da rede são obtidos
-através dos algoritmos de coleta de dados e pré-processamento,
-onde na coleta de dados o robô se move aleatoriamente enquanto se é
-coletado a posição,orientação,velocidade angulares das rodas do robô e
-tempo. No pré-processamento, estes dados são transformados em aproximações
-de velocidades lineares e angulares do robô. Ao todo foram coletados dez mil
+através da criação de  algoritmos de coleta de dados e pré-processamento.
+Ao todo foram coletados dez mil
 amostras para o treinamento. Já no controlador utiliza uma abordagem
 clássica que possui  dois controladores
 Proporcionais, integrais, derivativos (P.I.D),
 onde ambos os parâmetros dos P.I.Ds foram obtidos empiricamente.
-Para avaliar os modelos cinemáticos foi calculado o modelo analítico o qual
-é comparado com os outros dois modelos, também foi coletado um conjunto de
+Para avaliar os modelos cinemáticos foi calculado o modelo analítico,
+também foi coletado um conjunto de
 dados de testes que foi utilizado para o cálculo do erro quadrático
 médio para todos os modelos cinemáticos.
 Para avaliar todo o sistema foi posicionado um alvo e observado o robô no 
