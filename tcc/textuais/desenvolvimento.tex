@@ -13,13 +13,13 @@ O modelo cinemático é o maior desafio deste trabalho, pois como será visto
 mais adiante foi utilizado uma abordagem que mescla a solução analítica com
 algoritmos de aprendizado de máquina para gerar um modelo de um robô com
 acionamento diferencial, outra contribuição deste trabalho é o modelo do
-robô simulado, onde o controlador, e o modelo cinemático foram avaliados.
-O desenvolvimento do controlador, foi dividindo em quatro partes, a primeira
+robô simulado, onde o controlador e o modelo cinemático foram avaliados.
+O desenvolvimento do controlador foi dividindo em quatro partes, a primeira
 é a construção da simulação do robô, segunda foi a coleta de dados para
 a construção do modelo cinemático, terceira foi  modelado
 uma rede neural de modo que seus parâmetros se traduzissem nos parâmetros
 da cinemática, quarta e ultima parte conta o desenvolvimento
-do pre-processamento dos dados. 
+do pré-processamento dos dados. 
 
 
 \section{construção do robô em um ambiente simulado}
@@ -27,15 +27,18 @@ O simulador utilizado para a construção do robô foi o CoppeliaSim
 \cite{rooban2021coppeliasim}, antigamente conhecido como V-REP.
 Uma das contrições deste trabalho foi a criação de um cliente 
 \textit{zmqRemoteApi} para a linguagem de programação \textit{Rust}
-que se comunica com o simulador, \textit{Rust} foi adotado pois
+que se comunica com o simulador, \textit{Rust} foi adotada pois
 é capaz de produzir um código tão performático quando C/C++, além
 de possui um gerenciador de pacotes que facilita o desenvolvimento
 futuro de novas aplicações e reutilização de códigos. O ambiente
-simulado possui o formato quadro com um lado $l$ de 5 metros,
-além do robô, o ambiente possui um alvo, a qual o robô deve-se ir
-atrás dele, o alvo é um objeto que pode ser movido com mouse. 
+simulado possui o formato quadrado com um lado $l$ de 5 metros,
+além do robô, o ambiente possui um alvo, o qual o robô deve
+dirigir-se. O alvo é um objeto que pode ser movido com mouse. 
+Uma imagem do cenário completo pode ser visualizado na figura
+\ref{fig:cenario:completo}
 
 \begin{figure}[H]
+    \label{fig:cenario:completo}
     \centering
     \includegraphics[scale=0.2]{figuras/robo_simulado_1.png}%
     \hspace{1cm}
@@ -43,25 +46,26 @@ atrás dele, o alvo é um objeto que pode ser movido com mouse.
     \caption{Andador inteligente simulado}
 \end{figure}
 
-Como dito anteriormente, o robô possui um acionamento diferencial,
+Como dito anteriormente, o robô possui um acionamento diferencial.
 o CoppeliaSim, permite configurar os atuadores no modo controle de
-velocidade, neste modo, o cliente \textit{zmqRemoteApi} é capaz de enviar
-um sinal em radianos por segundo, a qual é aplicado instantaneamente.
-O modelo conta com sensores para odométrica como giroscópio e acelerômetro
-e um kinect, no entanto os sensores não foram utilizados neste trabalho,
-foi utilizado funções do próprio simulador para coletar posição e 
+velocidade. neste modo, o cliente \textit{zmqRemoteApi} é capaz de enviar
+um sinal em radianos por segundo, o qual é aplicado instantaneamente.
+O modelo conta com sensores para odometria como giroscópio e acelerômetro
+e uma câmera RGB-D do modelo Kinect, no entanto os sensores não foram
+utilizados neste trabalho.
+Foram utilizados funções do próprio simulador para coletar posição e 
 orientação do robô em relação ao referencial global.
 
 \section{Coleta de dados para o modelo cinemático}
 Tendo o robô modelado, a simulação configurada, então foi criado
-um algoritmo que faça o robô andar aleatoriamente pelo cenário ao mesmo
+um algoritmo que fazia o robô andar aleatoriamente pelo cenário ao mesmo
 tempo que se coletava a posição e orientação do robô em relação ao referencial
 global. O pseudo código pode ser observado no Algoritmo \ref{coleta:de:dados:}
 
 \begin{algorithm}[H]
     \label{coleta:de:dados:}
     
-    \Entrada{$N_a$:número de amostras, $K$: número de paços continuos }
+    \Entrada{número de amostras $N_a$, número de passos contínuos $K$ }
     %% \SetLine
     
     inicialize a conexão SIM  com o simulador
@@ -71,7 +75,7 @@ global. O pseudo código pode ser observado no Algoritmo \ref{coleta:de:dados:}
     mova o robô R para a origem e com uma orientação aleatória $\theta$,
     por meio da conexão SIM
 
-    \Para {$e \leftarrow 0$ \Ate $N_a$} {
+    \Para {$E \leftarrow 0$ \Ate $N_a$} {
         leia a posição $x_1$,$y_1$  e orientação $\theta_{1}$ do robô,
         referente a origem, por meio da conexão SIM
         
@@ -82,14 +86,14 @@ global. O pseudo código pode ser observado no Algoritmo \ref{coleta:de:dados:}
         
         envie  $\phi_l$,$\phi_r$, para o robô simulado pela conexão SIM
 
-        permita que a simulação ocorra por 50ms 
+        permita que a simulação ocorra por 50 ms 
 
         leia a posição $x_2$,$y_2$  e orientação $\theta_{2}$ do robô,
         referente a origem, por meio da conexão SIM
 
         leia o tempo $t_2$ da simulação.por meio da conexão SIM
 
-            \Se {$e$ é múltiplo de $K$}{
+            \Se {$E$ é múltiplo de $K$}{
                 
                 mova o robô R para a origem e com uma orientação aleatória $\theta$,
                 por meio da conexão SIM
@@ -107,37 +111,38 @@ global. O pseudo código pode ser observado no Algoritmo \ref{coleta:de:dados:}
 
 O parâmetro $K$ do algoritmo foi criado para que o robô não bata na parede
 da simulação, ele foi encontrado fazendo um teste empírico, mostrando que
-após 20 paços  com o robô caminhando em linha reta, o robô bate na parede,
+após 20 passos  com o robô caminhando em linha reta, o robô bate na parede,
 por tanto nos nossos testes $K = 18$. Um princípio foi adotado na coleta
 de dados: o robô deve-se mover lentamente em todas a direções, sabendo do
 fato que a velocidade linear máxima do robô é 0,8 metros por segundo,
 por tanto foi adotado que velocidade linear máxima da coleta seria de 
 0,165 metros por segundo, esse número foi adotado por ser significantemente,
-inferior a 0,8  e ser o dobro do raio das rodas, ou seja, na prática é gerado
+inferior a 0,8  e ser obtido aplicando uma velocidade angular nas rodas de 2
+radianos por segundo. Na prática são gerados
 dois números aleatórios de distribuição uniforme entre 0 e 1 e multiplicado por
 2, $V_{MAX} = 2$. O simulador retorna valores de posições $x$,$y$ em metros
 que variam de -2,5 até 2,5 metros, já a orientação do robô é medida em radianos
 que variam de $-\pi$ até $\pi$.
-
+%0,0825
 \section{Modelagem de parâmetros de redes neurais artificiais}
-Atualmente \textit{Frameworks} de aprendizado máquina supervisionado,
-tem evoluído bastante, uma das principais técnicas que revolucionou a
+Atualmente \textit{Frameworks} de aprendizado máquina supervisionado
+têm evoluído bastante, uma das principais técnicas que revolucionou a
 área de aprendizado de máquina é uma estrutura de dados chamada grafo
-computacional, ele é o um grafo direcionado e acíclico de operações com
+de computação, ele é o um grafo direcionado e acíclico de operações com
 tensores, onde um nó pode ser um tensor ou uma função que opera sobre
 tensores. A figura \ref{fig:grafo:computacional} é um exemplo de
-grafo computacional que foi retirada do livro \cite{chollet2021deep},
-onde $x$ e $y_{true}$ são as variáveis de entrada, e $w$ $b$ são
+grafo de computação que foi retirada do livro \cite{chollet2021deep},
+onde $x$ e $y_{true}$ são as variáveis de entrada, e w,b são
 os parâmetros da rede neural artificial. 
 
 \begin{figure}[H]
     \label{fig:grafo:computacional}
     \centering
     \includegraphics[scale=0.5]{figuras/grafo_computacional.png}
-    \caption{Grafo computacional}
+    \caption{grafo de computação}
 \end{figure}
 
-Sabendo que cada uma das duas rodas sequem as equações:
+Sabendo que cada uma das duas rodas segue as equações:
 \begin{align}
     \frac{1}{r}
     \begin{bmatrix}
@@ -155,7 +160,7 @@ Através dessa estrutura de dados e das equações, foi
 modelado os parâmetros de uma rede neural artificial,
 onde $\alpha$,$\beta$,$r$,$l$ são seus parâmetros,
 $\dot{\xi}$ a entrada do modelo e $\phi$ e $0$  são a saídas desejadas.
-O grafo computacional com essas operações são representadas por essas equações:
+O grafo de computação com essas operações é representado por essas equações:
 
 \begin{align}
     \gamma = \alpha + \beta \\
@@ -233,12 +238,12 @@ onde cada peso é $W_{i,j}$ é encontrado separadamente. Ambos os modelos foram
 treinados e foram discutidos na sessão de experimentos e resultados.
 
 
-\section{pre-processamento dos dados}
+\section{pré-processamento dos dados}
 A coleta de dados nos fornece dados de posição, orientação, velocidade angular
 das rodas do robô e tempo de simulação, portanto temos que transformar os dados
 de posição e orientação e tempo, em informação de velocidade linear e angular
-do robô, sendo que a velocidade linear tem que está no referencial do robô. O
-O pseudo código do pre-processamento pode ser observado no Algoritmo \ref{pre:processamento:}
+do robô, sendo que a velocidade linear tem que está no referencial do robô.
+O pseudo código do pré-processamento pode ser observado no Algoritmo \ref{pre:processamento:}
 
 \begin{algorithm}[H]
     \label{pre:processamento:}
@@ -299,11 +304,11 @@ O pseudo código do pre-processamento pode ser observado no Algoritmo \ref{pre:p
 
       \Retorna entrada\_modelo\_cinemático, saída\_modelo\_cinemático
     
-    \caption{Pre-processamento dos dados}
+    \caption{pré-processamento dos dados}
     
 \end{algorithm}
 
-Perceba que após a leita dos dados entrada é feita uma aproximação da
+Perceba que após a leitura dos dados de entrada é feita uma aproximação da
 velocidade angular e linear do robô através das variação de deslocamento
 sobre variação de tempo, também ao calcular a variação da orientação do robô
 é verificado se a diferença angular resultante $\Delta \theta$ é a menor.
@@ -314,5 +319,5 @@ Como dito anteriormente, foram testados dois modelos, um modelo mais complexo
 que envolve modelagem dos parâmetros da rede através das equações das rodas
 e outro modelo mais simples que busca encontrar uma transformação linear
 para os conjunto de dados, quando é realizado o treinamento do modelo complexo
-é adicionado mais dois vetores de zeros a saída do modelo cinemático, zeros
+são adicionados mais dois vetores de zeros á saída do modelo cinemático, zeros
 que são esperados pelas equações das rodas. 

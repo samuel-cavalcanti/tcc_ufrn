@@ -13,9 +13,10 @@ angulares das rodas sem levar em consideração as equações das rodas,
 o segundo experimento é o treinamento de um modelo cujo os parâmetros
 são constantes das equações rodas, onde o algoritmo de aprendizado
 de máquina deve realizar uma regressão não linear para encontrar
-estes parâmetros, por fim é resolvido analaticamente a cinemática
+estes parâmetros, por fim é resolvida analaticamente a cinemática
 com a finalidade de comparar com os dois modelos. Em relação ao controlador,
-foi implementado o controlador Frederico e encontrado as constantes do P.I.D empiricamente.
+foi implementado o controlador Vieira e encontradas as constantes do P.I.D
+empiricamente.
 
 
 \section{Experimentos com a Cinemática}
@@ -33,8 +34,8 @@ em \textit{Python}, para se chegar a esse número foi executado 10 mil vezes o c
 da cinemática, em um \textit{notebook} com processador de 4 núcleos \textit{AMD Ryzen 5 2500U},
 sem placa de vídeo dedicada. Para a criação dos modelos foi executado o
 algoritmo de coleta de dados obtendo conjunto com 10 mil
-pontos, durante o treinamento é dividido este conjunto de dados
-onde 60\% dos dados é utilizado para treinamento e 40\% é utilizado
+pontos. Durante o treinamento é dividido este conjunto de dados
+onde 60\% dos dados são utilizados para treinamento e 40\% foi utilizado
 apenas para avaliação, ou seja, a rede não possui informação sobre esses
 pontos durante o treinamento, nas figuras \ref{fig:error:quadratico:nao:linear} e
 \ref{fig:error:quadratico:linear} a linha vermelha representa o erro de
@@ -56,7 +57,7 @@ foi o erro quadrático médio.
     \caption{Erro Médio quadrático regressão linear}
 \end{figure}
 
-Para teste dos modelos cinemáticos foi coletado mais 10 mil pontos,
+Para teste dos modelos cinemáticos foram coletados mais 10 mil pontos,
 mas dessa vez com o robô podendo variar a velocidade angular das rodas
 para até 5 vezes o raio da roda, ou seja $V_{MAX}=5$, no entanto ao invés
 de coletar dados de posição, foi extraído do simulador diretamente a
@@ -71,7 +72,7 @@ velocidade do robô.
 
 Podemos observar que na figura \ref{fig:conj:dados} que o conjunto
 de dados para treinamento e avaliação do modelo 
-são um sub conjunto do conjunto de testes. Foi calculado o erro quadrático
+é um sub conjunto do conjunto de testes. Foi calculado o erro quadrático
 médio dos modelos em relação ao conjunto de testes gerando a
 tabela \ref{table:mse:test}
 
@@ -142,8 +143,8 @@ em graus, e os raio da roda $r$ e distância $l$ estão em metros.
     \caption{parâmetros das rodas após a regressão não linear}
 \end{table}
 Perceba que o angulo $\gamma = \alpha + \beta$ do modelo gerado pela regressão não
-linear foi de $\gamma_{k_1} = 115,6515 -25,8002  = 89.8513$ e 
-$\gamma_{k_2} = 62,3091 +27,1352 = 89.4443$
+linear foi de $\gamma_{k_1} = 115,6515 -25,8002  = 89,8513$ e 
+$\gamma_{k_2} = 62,3091 +27,1352 = 89,4443$
 \begin{table}[H]
     \label{table:param:analytic}
     \centering
@@ -160,7 +161,7 @@ $\gamma_{k_2} = 62,3091 +27,1352 = 89.4443$
 \end{table}
 
 
-Como dito anteriormente foi utilizado o controlador Frederico,
+Como dito anteriormente foi utilizado o controlador Vieira,
 cujo os parâmetros dos P.I.Ds foram adquiridos empiricamente,
 visando minimizar o sobre-sinal do controlador de velocidade linear,
 os valores podem ser vistos na tabela \ref{table:pid:}.
@@ -184,7 +185,7 @@ Para avaliar o sistema de controle, com os diferentes modelos
 cinemáticos, foi posicionado um alvo e observado o robô no seu
 trabalho em chegar até alvo mensurando a distância e o angulo do robô até
 o alvo, essas duas medidas foram escolhidas pois 
-estes são os valores a serem minimizados pelo controlador Frederico,
+estes são os valores a serem minimizados pelo controlador Vieira,
 o alvo foi posicionado em quatro lugares diferentes como mostra a figura
 \ref{fig:robo:e:4:alvos}.
 
@@ -224,7 +225,8 @@ o alvo foi posicionado em quatro lugares diferentes como mostra a figura
 \end{figure}
 
 Perceba os pontos dos modelos obtidos através da regressão e o modelo analítico
-estão sobrepostos
+estão sobrepostos.
+
 \section{Discussão dos Experimentos}
 Na observação do robô em seu trabalho de chegar até o alvo, os modelos
 obtidos através da regressão linear e não linear tiveram respostas
@@ -234,7 +236,7 @@ podemos dizer que os modelos são equivalentes, outro ponto interessante é
 observar a generalização do modelos, uma vez que o conjunto do treinamento
 é um sub conjunto do conjunto de testes o que nos dá segurança em aplicar
 o modelo em dados nunca vistos, em aprendizado de máquina supervisionada
-muitas vezes é feito uma escolha em generalização e otimização, onde um
+muitas vezes é feita uma escolha em generalização e otimização, onde um
 modelo mais otimizado ao conjunto de dados de treinamento tende a não ir
 bem e dados fora desse conjunto, no entanto ao modelarmos o sistema cinemático
 do robô ao mesmo tempo que modelamos os pesos de uma rede neural artificial,
@@ -246,7 +248,7 @@ o erro com trinta mil iterações, apesar do tempo de treinamento está
 fortemente relacionado om os valores iniciais da rede, a regressão não
 linear teve mais duas equações iguais a zero que ajudou a guiar o erro
 mais rápido. Outro ponto interessante de se notar na figura \ref{fig:parametros:da:cinemantica}
-que os pesos da regressão linear afirmam existir uma contribuição negativa
+é que os pesos da regressão linear afirmam existir uma contribuição negativa
 de velocidade linear no eixo y do robô, algo também observado no modelado de
 regressão não linear, só que com valores inferiores devido as equações,
 talvez estes valores deve-se a aproximação da velocidade por meio da variação
@@ -270,5 +272,5 @@ cinemática que contem 6 elementos, então o computador utilizado não irá prec
 sendo a parte mais crítica o armazenamento de um buffer durante o algoritmo
 da coleta de dados, outro pronto crítico seria o tempo de bateria durante
 a coleta de dados, mas considerando que um ciclo de controle esta por volta
-de 30ms, portanto para coletar 10 mil amostras equivale a 300 segundos, ou
+de 30 ms, portanto para coletar 10 mil amostras equivale a 300 segundos, ou
 seja, 5 minutos.

@@ -4,10 +4,21 @@
 
 \mychapter{Fundamentação Teórica}
 \label{Cap:Teoria}
+Este trabalho envolve a cinemática de um robô móvel,
+a implementação de um controlador de estabilizante
+que utiliza as leis de controle,
+algoritmos de aprendizado de máquina. Portanto esta seção
+visa explicar as partes fundamentais destas areas do conhecimento,
+que foram utilizada neste trabalho, primeiro abordaremos o problema
+da cinemática focando em robôs moveis de acionamento diferencial,
+segundo abordaremos o aprendizado de máquina supervisionado
+relacionando o tema com a cinemática, terceiro explicaremos o
+funcionamento do controlador cinemático de estabilizante criado
+por Federico Vieira.
 
 \section{O problema da cinemática de um robô móvel}
-Dado um robô de acionamento diferencial, onde a velocidade
-angular das $n$ rodas são: $\phi_0,\phi_1,\phi_2,...,\phi_n$.
+Dado um robô de acionamento diferencial, onde as velocidades
+angulares das $n$ rodas são: $\phi_0,\phi_1,\phi_2,...,\phi_n$.
 Uma cinemática direta $f$ de um robô móvel é a uma função que mapeia as
 velocidades
 angulares das rodas para a velocidade linear $v$ e velocidade angular $\omega$
@@ -19,14 +30,16 @@ linear $v$ e angular $\omega$
 com as velocidades das rodas $\phi$.
 
 \begin{figure}[H]
+    \label{fig:robo:movel:acionamento:diferencial}
     \centering
     \includegraphics[scale=0.9]{figuras/robo.png}
-    \caption[]{Robô móvel com acionamento diferencial}
+    \caption{Robô móvel com acionamento diferencial}
 \end{figure}
 
 A cinemática de um robô móvel está fortemente relaciona a modelagem
-das rodas do robô, para um robô com duas rodas de acionamento diferencial
-as equações que regem o movimento são:
+das rodas do robô. Para um robô com duas rodas de acionamento diferencial
+como mostrado na figura \ref{fig:robo:movel:acionamento:diferencial}
+as equações que regem o movimento dele são:
 
 \[
 \begin{bmatrix}
@@ -63,16 +76,14 @@ as equações que regem o movimento são:
 \end{bmatrix}
 \]
 onde $\alpha$, $\beta$, $l$,$r$ são propriedades das rodas do robô,
-$v_x$,$v_y$ são as velocidade lineares do eixo x,y.
+$v_x$,$v_y$ são as velocidade lineares ao longo dos eixos x,y.
 É importante salientar que os parâmetros das
 rodas são extraídos seguindo o referencial do robô $X_r$,$Y_r$ assim como
-as velocidades. Caso a velocidade linear do robô for medida em outro
-referencial, é necessário fazer uma rotação do referencial
-medido para a orientação $X_r$,$Y_r$.
+as velocidades.
 \begin{figure}[H]
     \centering
     % \includegraphics[scale=0.9]{figuras/robo.png}
-    \includegraphics[scale=0.3]{figuras/robo_coordenadas.png}
+    \includegraphics[scale=0.28]{figuras/robo_coordenadas.png}
    
     \[
     \begin{bmatrix}
@@ -92,28 +103,33 @@ medido para a orientação $X_r$,$Y_r$.
         \omega
     \end{bmatrix}
 \]
-\caption[]{Mudança de referencial}
+\caption{Mudança de referencial}
+\label{fig:mudanca:referencial}
+\end{figure}
+
+Caso a velocidade linear do robô for medida em outro
+referencial, é necessário fazer uma rotação do referencial
+medido para a orientação $X_r$,$Y_r$. Ná figura \ref{fig:mudanca:referencial}
+podemos observar um exemplo de mudança de referencial,
+onde $v_{x_I}, v_{y_I}$, são as velocidades no referencial $X_I,Y_I$.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{figuras/smart_walker.png}
+    \caption{Andador robótico inteligente}
+    \label{fig:andador:robotico:inteligente}
 \end{figure}
 
 
-
-onde $v_{x_I}, v_{y_I}$, são as velocidades no referencial $X_I,Y_I$.
 No nosso caso o robô a ser modelado possui quatro rodas, duas delas são
 rodas de acionamento diferencial e as outras duas rodas são rodas castores.
+Uma imagem do robô pode ser vista na figura \ref{fig:andador:robotico:inteligente}.
 Apesar das rodas castores, contribuírem para o movimento, elas não restringem
 o movimento, portanto podemos entender o modelo cinemático do nosso robô
 como sendo uma transformação linear $W \times X = Y$, onde $X$ é o vetor
 de velocidades, e $W$ a matriz de valores constantes obtidas após resolver
 as equações.
-% No nosso robô,
-% caso queremos calcular a cinemática direta a entrada $X$ são as
-% velocidades das rodas do robô e $Y$ a velocidade linear e angular do
-% robô, caso queiramos calcular a cinemática inversa do robô, $X$ são
-% as velocidades lineares e a velocidade angular do robô e $Y$ as velocidades
-% da rodas. Neste trabalho visamos criar um controlador para o robô e
-% como o controlador enviará um sinal de velocidade linear e angular
-% para a cinemática, portanto queremos a cinemática inversa do nosso robô.
-% 
+
 \begin{figure}[H]
     \[
     \begin{bmatrix}
@@ -135,19 +151,14 @@ as equações.
 \end{figure}
 
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[scale=0.4]{figuras/smart_walker.png}
-    \caption{Andador inteligente}
-\end{figure}
 
 \section{Aprendizado de máquina}
 Usualmente quando programamos computadores para
-resolver determinada tarefa, nos codificamos as regras e
-executamos o programa com os dados de entrada, esta é a abordagem clássica
-de se resolver um problema. Uma outra abordagem
+resolver determinada tarefa, nós codificamos as regras e
+executamos o programa com os dados de entrada e obtemos a resposta.
+Esta é a abordagem clássica de se resolver um problema. Uma outra abordagem
 é criar sistemas de aprendizado máquina, onde nós possuímos os
-dados de entrada necessários, as respontas e queremos que a máquina retorne
+dados de entrada, as respontas e queremos que a máquina retorne
 para nós quais são as regras que transformam os dados nas respostas
 desejadas \cite{chollet2021deep}.
 
@@ -180,7 +191,7 @@ cinemática inversa do robô andador inteligente.
 Os algoritmos de aprendizado supervisionado utilizado neste trabalho
 foram o Backpropagation e uma variação do algoritmo decida do gradiente, chamada
 RMSprop.
-Dado uma função $L(M)$, onde $L$ é uma função continua e derivável,
+Dado uma função $L(M)$, onde $L$ é uma função contínua e derivável,
 a decida do gradiente é uma busca que visa encontrar
 a melhor matriz $M$ que minimiza uma função $L(M)$, basicamente a
 decida do gradiente parte do suposto que existe a sequência
@@ -188,14 +199,11 @@ $M_0$, $M_1$, $M_2$, ..., $M_i$, $M_{i+1}$ até $M_k$, onde quando
 chegar até $M_k$, o erro $L(M_k)$ será um ponto de mínimo e a transição
 entre o $M_{i}$ até $M_{i+1}$, segue a seguinte regra:
 
-\begin{figure}[H]
-    \[
-        M_{i+1} = M_i -\alpha \nabla L(M_i)
-    \]
-    \caption{Equação da decida do gradiente}
-\end{figure}
+\begin{equation}
+    M_{i+1} = M_i -\alpha \nabla L(M_i)
+\end{equation}
 
-onde $\nabla L(W)$ é o gradiente da função erro em relação $M$ aplicado
+onde $\nabla L(W_i)$ é o gradiente da função erro em relação $M$ aplicado
 a $M_i$ e $\alpha$ é um número que varia de 0 até 1,
 também conhecido com taxa de aprendizado. Uma variação desse algoritmo
 basicamente utilizado é chamado RMSprop, ele se inspira na ideia de momentum
@@ -214,13 +222,15 @@ vetorial $v_{\text{vel}}$ análoga a velocidade, criando uma nova equação de d
 As variáveis $v_{\text{vel}_t}$ e  $b_t$, são inicializadas como zero, pode acontecer
 que  $\sqrt{v_{\text{vel}_t}}$ seja zero ou bem próximo disso então para não ter uma equação
 divida por zero é adicionado uma variável $\epsilon =10^{-8}$, deixando o algoritmo numericamente
-mais estável. Em contexto de aprendizado supervisionado a função $L$ é uma função erro que a
-partir do Backpropagation, encontra-se os gradientes dos parâmetros de um modelo a partir
-de pontos $X$ e $Y_{\text{true}}$ coletados, partindo de  uma definição de um modelo como por exemplo uma
+mais estável. Em contexto de aprendizado supervisionado a função $L$ é uma função erro, que 
+através do RMSprop os parâmetros dos modelo são guiados no sentido de minimizar o seu valor.
+No entanto não se possui diretamente o gradiente de $L$ em relação aos parâmetros, para isso
+é utilizado o  Backpropagation que encontra os gradientes a partir
+de pontos $X$ e $Y_{\text{true}}$ coletados. Partindo de  uma definição de um modelo como por exemplo uma
 transformação geométrica $Y_{\text{pred}}= A \times X + B$, e uma definição de uma função
 erro como: $L=(Y_{\text{true}}- Y_{\text{pred}})^2$ podemos utilizar o algoritmo
 Backpropagation para encontrar os gradientes da função $L$ em relação a $A$
-e  $B$, basicamente o Backpropagation executa automaticamente a regra da cadeia
+e  $B$. Basicamente o Backpropagation executa automaticamente a regra da cadeia
 para encontrar os gradientes e com os gradientes podemos executar o RMSprop.
 
 \begin{figure}[H]
@@ -233,17 +243,17 @@ para encontrar os gradientes e com os gradientes podemos executar o RMSprop.
 
 
 
-\section{Controlador estabilizante Federico}
+\section{Controlador estabilizante Vieira}
 Controladores cinemáticos ou controladores de movimento, podem ser 
-divididos em dois tipos, seguidores de trajetória e retroalimentação,
+divididos em dois tipos, seguidores de trajetória e estabilizante,
 controladores seguidores trajetória recebem como entrada um perfil
 de caminho sobre o tempo, a qual o controlador envia sinais de
 velocidade linear e angular para o robô de modo que ele siga a
-trajetória idealizada, já controladores de retroalimentação
+trajetória idealizada, já controladores de estabilizante
 eles recebem como entrada um estado atual do robô e o estado desejado
 e buscam enviar sinais de velocidade linear e angular com o objetivo
 de minimizar o erro entre o estado atual e desejado. Neste trabalho
-foi utilizado um controlador de retroalimentação criado por Frederico
+foi utilizado um controlador de estabilizante criado por Frederico
 \cite{vieira2006controle}, o controlador recebe como entrada a posição
 $p_c$  no plano x,y , orientação $\theta_c$ atual do robô e uma posição desejada $p_d$
 e enviar sinais de velocidade linear $v$ e angular $\omega$ com o
@@ -251,8 +261,8 @@ objetivo de estabilizar o robô no ponto desejado.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.8]{figuras/controlador_frederico.pdf}
-    \caption{Bloco controlador Frederico}
+    \includegraphics[scale=0.8]{figuras/controlador_viera.pdf}
+    \caption{Bloco controlador Vieira}
 \end{figure}
 
 Internamente o controlador utiliza  dois controladores proporcionais
@@ -261,20 +271,18 @@ e outro controlador é responsável pela velocidade angular $\omega$.
 Um controlador P.I.D é definido pela a seguinte função de
 transferência $C(s)$ no domínio continuo $s$
 
-\begin{figure}[H]
-    \[
-        C(s) = K_p + \frac{K_i}{s} + K_ds
-    \]
-    \caption{Função de transferência de um controlador P.I.D }
-\end{figure}
+\begin{equation}
+    C(s) = K_p + \frac{K_i}{s} + K_ds
+\end{equation}
+
 onde $K_p$,$K_i$,$K_d$ são constantes que podem ser adquiridas ou
 através da experimentação ou uma analise matemática \cite{ogataengenharia}. Para gerar sinais
-velocidades $v$ e $\omega$,  o controlador Federico funciona da seguinte
+velocidades $v$ e $\omega$,  o controlador Vieira funciona da seguinte
 maneira, primeiro é calculado o vetor posição $p_{\text{diff}}$:
 \[
     p_{\text{diff}} = p_d - p_c 
 \]
-segundo é calculado suas coordenadas polares $l$, $\alpha$:
+segundo são calculadas suas coordenadas polares $l$, $\alpha$:
 
 \[
     l = \sqrt{p_{\text{diff}_x}^2 + p_{\text{diff}_y}^2}
@@ -291,10 +299,10 @@ do vetor $p_{\text{diff}}$.  Terceiro é calculado o angulo $\gamma$:
 
 
 por fim o controlador P.I.D de velocidade
-linear, buscar enviar um sinal $v$ que para tender o valor $l \cos(\gamma)$
+linear, buscar enviar um sinal $v$ que faça tender o valor $l \cos(\gamma)$
 a zero e o controlador de velocidade angular busca enviar um sinal $\omega$
-para  tender o valor de $\gamma$ a zero. perceba que quando o valor de $\gamma$
-tende a zero, da velocidade linear vai tender a reduzir apenas
+para  tender o valor de $\gamma$ a zero. Perceba que quando o valor de $\gamma$
+tende a zero, a velocidade linear vai tender a reduzir apenas
 distância $l$. Como o modelo cinemático do robô espera receber como entrada
 um vetor de velocidade linear em coordenadas cartesianas então é preciso
 transformar de volta a velocidade $v$ 
