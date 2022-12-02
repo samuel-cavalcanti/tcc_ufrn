@@ -150,7 +150,20 @@ as equações.
     \caption{Cinemática inversa}
 \end{figure}
 
+Um fato muito importante sobre a cinemática do robô de acionamento diferencial
+é que resolvendo a cinemática analaticamente vamos perceber que
+$\alpha + \beta = 90^{\circ}$ e $\sin(\beta) = 0$, portanto a equação:
 
+\begin{equation}
+    v_x\cos(\alpha + \beta)  + v_y\sin(\alpha + \beta) +  \omega l_n\sin(\beta) = 0
+\end{equation}
+
+irá se traduzir em:
+\begin{equation}
+    v_y = 0
+\end{equation}
+ou seja, segundo a solução analítica não é possível que
+o robô translade no eixo y.
 
 \section{Aprendizado de máquina}
 Usualmente quando programamos computadores para
