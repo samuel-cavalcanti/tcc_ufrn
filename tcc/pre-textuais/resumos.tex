@@ -68,9 +68,41 @@ controlador cinemático.
 %
 \mychapterast{Abstract}
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vehicula vitae lectus ut pretium. Vestibulum tristique leo eu purus vehicula ullamcorper. Nulla ut ultricies massa. Suspendisse eu neque pharetra, faucibus erat ac, pretium augue. Vivamus id euismod leo. Cras eget neque pellentesque, fringilla dolor eu, pretium libero. Mauris sed justo feugiat, varius ligula sed, posuere metus. Fusce lacus mi, molestie a rutrum id, scelerisque ut lacus. In hac habitasse platea dictumst. In vitae elit faucibus, molestie orci efficitur, consectetur neque. Ut placerat, augue eu pellentesque euismod, dui enim euismod elit, quis sollicitudin lectus lorem gravida mi. Donec ut leo pretium, finibus arcu in, tincidunt sem. Phasellus diam ante, pulvinar vel neque non, sagittis aliquam nibh. Praesent id condimentum nunc, quis interdum metus. Curabitur eget diam vitae enim consequat mollis quis dictum turpis.
+This work is about creating a kinematic control to the smart robotic walker,
+the system must be able to stabilize the robot in a desired position
+in the environment without obstacles. This work aims to study and evaluate
+machine learning algorithms
+on creation of the kinematic model. First a literature review about
+machine learning in context of kinematic control was made. Second the
+simulation of the robot and the environment was builded with The robotics
+simulator CoppeliaSim. Third the control system was created.
+Was created two kinematic models, both models obtained using supervised learning,
+the parameters of the neural networks are the kinematics parameters or
+inspired by the kinematic constraints. To training these networks
+an algorithm to collect data from simulation
+ and another algorithm to preprocessing this data was made. The controller
+is a feedback control with two proportional-integral-derivate (PID) controllers
+with the parameters obtained empirically. The models were evaluated using the
+analytical model and a test dataset. To evaluate the kinematic control system
+a target was putted in the environment and was measured the distance and the
+angle between the robot and the target on the process where the robot must
+go to the target, the target was putted in four different positions.
+The results of mean square error of the models in the test dataset and
+the graphs of distance and angle shows that the models are equivalent.
+The parameters of neural network
+that have the kinematic equations, show that the wheel radius and the
+distance between the wheels are proximately to the analytical solution, but
+the machine learning model found another combination of wheel angles.
+This work concluded in the literature review that classic approach
+with PIDs is better than machine learning models, because of memory
+and processing usage. This work concluded that creating a kinematic
+control system though the analytical solution is more simpler than
+with machine learning, and creating a neural network with the parameters
+inspired by the kinematic constraints produces a model equivalent to
+the analytical model.
+
+
 
 \vspace{1.5ex}
 
-{\bf Keywords}: Document Processing, \LaTeX, Thesis Preparation,
-Technical Reports.
+{\bf Keywords}: Machine learning, differential wheeled robot, kinematic control
