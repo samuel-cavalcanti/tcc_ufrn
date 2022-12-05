@@ -72,21 +72,21 @@ This work is about creating a kinematic control to the smart robotic walker,
 the system must be able to stabilize the robot in a desired position
 in the environment without obstacles. This work aims to study and evaluate
 machine learning algorithms
-on creation of the kinematic model. First a literature review about
-machine learning in context of kinematic control was made. Second the
+on creation of the kinematic model. First, a literature review about
+machine learning in context of kinematic control was made. Second, the
 simulation of the robot and the environment was builded with The robotics
-simulator CoppeliaSim. Third the control system was created.
-Was created two kinematic models, both models obtained using supervised learning,
+simulator CoppeliaSim. Third, the control system was created.
+Two kinematic models were created, both models obtained using supervised learning,
 the parameters of the neural networks are the kinematics parameters or
-inspired by the kinematic constraints. To training these networks
+inspired by the kinematic constraints.In order to training these networks
 an algorithm to collect data from simulation
  and another algorithm to preprocessing this data was made. The controller
 is a feedback control with two proportional-integral-derivate (PID) controllers
 with the parameters obtained empirically. The models were evaluated using the
-analytical model and a test dataset. To evaluate the kinematic control system
-a target was putted in the environment and was measured the distance and the
-angle between the robot and the target on the process where the robot must
-go to the target, the target was putted in four different positions.
+analytical model and a test dataset. In order to evaluate the kinematic
+control system, was observed the robot in your position stabilization
+task where during the task the distance and angle between the robot and
+the goal were measured, this task was executed four times.
 The results of mean square error of the models in the test dataset and
 the graphs of distance and angle shows that the models are equivalent.
 The parameters of neural network
@@ -106,3 +106,8 @@ the analytical model.
 \vspace{1.5ex}
 
 {\bf Keywords}: Machine learning, differential wheeled robot, kinematic control
+
+
+
+
+
