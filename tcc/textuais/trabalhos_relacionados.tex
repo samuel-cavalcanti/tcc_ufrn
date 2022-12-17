@@ -10,7 +10,7 @@ da arte do aprendizado por reforço, o segundo e terceiro artigo são
 trabalhos que buscaram criar um controlador usando aprendizado por reforço
 que rivaliza com os controladores que utilizam a abordagem clássica de controle.
 Estes dois últimos artigos foram determinantes para escolher o controlador
-de estabilizante Vieira. Para este trabalho a parte fundamental do primeiro artigo
+estabilizante Vieira. Para este trabalho a parte fundamental do primeiro artigo
 foi resumida na seção \ref{sec:muzero}. A forma como os outros dois artigos
 utilizaram aprendizado por reforço para criar um controlador de posição e seus
 resultados foi escrita na seção \ref{sec:controlador:posicao:aprendizado:reforco}.
@@ -24,16 +24,17 @@ MuZero é um sistema de aprendizado de máquina que utiliza algoritmos de
 aprendizado por reforço e aprendizado supervisionado para
 resolver jogos de atari, xadrez e Shogi também conhecido como
 xadrez japonês. O MuZero é um sistema com três componentes:
-Representação, dinâmica e predição, Representação é uma uma
+Representação, dinâmica e predição. Representação é uma uma
 função $h_{\theta}$  que recebe $t$ observações 
 e cria uma Representação interna $s$, $s = h_{\theta}(o_1,...,o_t)$,
 onde $o$ é uma observação, onde uma observação pode ser entendia como sendo
 um vetor que contem todos os valores dos sensores em um instante $t$.
 A predição é uma função $f_{\theta}$ que recebe uma representação $s$
-e retorna uma vetor de valores $v[k]$ que dizem o quão boa seria tomar
-uma decisão discreta $k$,  $v[k] =  f_{\theta}(s)$ ,
-para cada ação discreta $k$, uma ação $a$, poderia ser o índice do maior
-valor de $v[k]$ ou utilizar a busca em árvore como no método Monte Carlo
+e retorna uma vetor $v$ de tamanho $k$, onde um índice do vetor $v$ representa
+uma ação discreta e cada elemento do vetor $v$ é um valor que diz o quão bom
+seria tomar a decisão do seu respectivo índice,  $v[k] =  f_{\theta}(s)$.
+Uma ação $a$, poderia ser o índice do maior
+valor de $v$ ou utilizar a busca em árvore como no método Monte Carlo
 através do modelo de dinâmica. O modelo de dinâmica é uma outra função
 $g_{\theta}$, que busca prever dado uma ação $a^k$ e um estado $s^{k}$,
 o estado $s^{k+1}$ e sua recompensa $r^{k+1}$ associada ao estado,
@@ -56,7 +57,7 @@ necessário  para que o sistema seja genérico o suficiente para jogar
 diferentes jogos. É importante destacar a diferença entre o controlador P.I.D
 que toma decisões a partir de $n$ instantes anteriores ($t_n,t_{n-1},...t_{0}$),
 já o $f_{\theta}$
-com a buscar Monte Carlo toma decisões em $k$ instantes futuros ($t_n,t_{n+1},...t_{n+k}$)
+treinado a partir do método Monte Carlo toma decisões em $k$ instantes futuros ($t_n,t_{n+1},...t_{n+k}$)
 utilizando a função $g_{\theta}$ análoga á planta.
 
 \begin{figure}[H]
@@ -68,7 +69,7 @@ utilizando a função $g_{\theta}$ análoga á planta.
 \section{Controlador de posição e aprendizado por reforço }
 \label{sec:controlador:posicao:aprendizado:reforco}
 Utilização de aprendizado por reforço para criação de controladores
-de estabilizante, foi observado em \cite{farias2020position}
+estabilizantes, foi observado em \cite{farias2020position}
 a qual mostrou que o algoritmo \textit{Q-learning} é capaz de aprender
 as regras de um controlador com restrições de velocidades linear e angular
 para  posicionar o robô em determinada posição, no entanto em seus
@@ -78,7 +79,7 @@ inferior a um controlador que utiliza as leis clássicas de controle.
 \subsection{Q-learning}
 Uma Função ação-valor determina o quão bom 
 para o robô é tomar uma determinada ação $A_t$ quando se está no estado
-$S_t$, \textit{Q-learning} é um algoritmo de aprendizado por reforço que
+$S_t$. \textit{Q-learning} é um algoritmo de aprendizado por reforço que
 busca aprender uma função ação-valor $Q$ que diretamente aproxima
 a função ação-valor ótima $Q^*$ independente do algoritmo utilizado
 para selecionar uma ação. O que faz o algoritmo aproximar a função ótima
@@ -91,7 +92,7 @@ onde $S_t$ e $A_t$ é respectivamente estado,ação, $\max_aQ(S_{t +1},a)$ é o 
 ação de maior valor no estado $S_{t+1}$ e as constantes $\alpha$, $\gamma$ são taxas
 de aprendizado que variam de 0 até 1. É muito comum representar a função $Q$
 sendo como uma tabela, onde o estado $S$ e ação $A$ são indices. Em contexto de
-controladores de estabilizante para robôs moveis, o estado pode ser um
+controladores estabilizantes para robôs moveis, o estado pode ser um
 valor de distância até o alvo discretizado e ação pode ser movimentos simples
 como girar para esquerda, direita, ir para frente ou ir de rê. Por fim o valor é
 número contínuo ou discreto derivado de uma função recompensa que poder
@@ -139,22 +140,28 @@ a a variação de distância até o alvo observada após o movimento.
 
 Em \cite{quiroga2022position}
 foram utilizado algoritmos variantes do \textit{Q-learning},
-como \textit{Deep Q-learning Network} e \textit{Deep Deterministic Policy Gradient},
-para encontrar as regras de um controlador que posicione o robô em determinada
-posição e evite de obstáculos usando sensores ultrassônicos,
-apesar do sucesso, o controlador gerado pelos algoritmos não envia
+como \textit{Deep Q-learning Network} (D.Q.N) e
+\textit{Deep Deterministic Policy Gradient} (D.D.P.G),
+para encontrar as
+regras de um controlador que posicione o robô em determinada
+posição e evite de obstáculos usando sensores ultrassônicos.
+Apesar do sucesso, o controlador gerado pelos algoritmos não envia
 os sinais de velocidades angulares diretamente para o modelo cinemático
 do robô, os sinais eram a entrada para o algoritmo de Braitenberg, um
 algoritmo que converte sinais de distância de obstáculos em velocidades
-lineares e angulares de modo que evite a colisão com obstáculos, além do treinamento permitir que o robô
+lineares e angulares de modo que evite a colisão com obstáculos.
+Além do treinamento permitir que o robô
 colida com o obstáculo, foi observado que o tempo de treinamento desses modelos
 foram de 8,6 e 11,4 horas de treinamento para \textit{Deep Q-learning Network}
-e \textit{Deep Deterministic Policy Gradient}, respectivamente. Segundo o
-artigo o melhor o controlador foi o \textit{Deep Deterministic Policy Gradient}
-que conseguiu chegar na posição desejada 3 segundos mais rápido do que o
-melhor controlador que utiliza as leis clássicas de controle isso em um ambiente sem
-obstáculos e em um ambiente com obstáculos a diferença aumentou para
-17,3 segundos, no entanto a distância do robô até os obstáculos ficou
+e \textit{Deep Deterministic Policy Gradient}, respectivamente.
+Segundo o
+artigo o melhor o controlador foi o \textit{Deep Deterministic Policy Gradient}.
+Ele conseguiu chegar na posição desejada mais rápido do que o
+melhor controlador que utiliza as leis clássicas de controle.
+Em um ambiente sem obstáculos D.D.P.G chegou 3 segundos mais rápido
+do que o melhor controlador que utiliza as leis clássicas de controle.
+Em um ambiente com obstáculos a diferença aumentou para
+17,3 segundos. No entanto a distância do robô até os obstáculos ficou
 inferior a 20 centímetros, ou seja, o modelo de aprendizado encurtou o
 caminho ficando mais próximo de bater no obstáculo. É importante dizer que
 em ambos os trabalhos foi utilizado um robô de acionamento diferencial.

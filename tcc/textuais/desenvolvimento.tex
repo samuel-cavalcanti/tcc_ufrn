@@ -7,16 +7,16 @@
 
 O principal objetivo desse trabalho é criar um controlador para
 um Andador inteligente, sendo este controlador pensado para requerer
-pouca memória e processamento, também visa-se estudar e aplicar algoritmos
+pouca memória e processamento. Também visa-se estudar e aplicar algoritmos
 de aprendizagem de máquina de modo a gerar um modelo cinemático do robô.
 O modelo cinemático é o maior desafio deste trabalho, pois como será visto
 mais adiante foi utilizado uma abordagem que mescla a solução analítica com
 algoritmos de aprendizado de máquina para gerar um modelo de um robô com
-acionamento diferencial, outra contribuição deste trabalho é o modelo do
+acionamento diferencial. Outra contribuição deste trabalho é o modelo do
 robô simulado, onde o controlador e o modelo cinemático foram avaliados.
-O desenvolvimento do controlador foi dividindo em quatro partes, a primeira
-é a construção da simulação do robô, segunda foi a coleta de dados para
-a construção do modelo cinemático, terceira foi  modelado
+O desenvolvimento do controlador foi dividindo em quatro partes. A primeira
+é a construção da simulação do robô. Segunda foi a coleta de dados para
+a construção do modelo cinemático. Terceira foi  modelado
 uma rede neural de modo que seus parâmetros se traduzissem nos parâmetros
 da cinemática, quarta e ultima parte conta o desenvolvimento
 do pré-processamento dos dados. 
@@ -27,12 +27,12 @@ O simulador utilizado para a construção do robô foi o CoppeliaSim
 \cite{rooban2021coppeliasim}, antigamente conhecido como V-REP.
 Uma das contrições deste trabalho foi a criação de um cliente 
 \textit{zmqRemoteApi} para a linguagem de programação \textit{Rust}
-que se comunica com o simulador, \textit{Rust} foi adotada pois
-é capaz de produzir um código tão performático quando C/C++, além
+que se comunica com o simulador. \textit{Rust} foi adotada pois
+é capaz de produzir um código tão performático quanto C/C++, além
 de possui um gerenciador de pacotes que facilita o desenvolvimento
 futuro de novas aplicações e reutilização de códigos. O ambiente
-simulado possui o formato quadrado com um lado $l$ de 5 metros,
-além do robô, o ambiente possui um alvo, o qual o robô deve
+simulado possui o formato quadrado com um lado $l$ de 5 metros.
+Além do robô, o ambiente possui um alvo, o qual o robô deve
 dirigir-se. O alvo é um objeto que pode ser movido com mouse. 
 Uma imagem do cenário completo pode ser visualizado na figura
 \ref{fig:cenario:completo}
@@ -56,7 +56,7 @@ Uma imagem do cenário completo pode ser visualizado na figura
 \end{figure}
 
 Como dito anteriormente, o robô possui um acionamento diferencial.
-o CoppeliaSim, permite configurar os atuadores no modo controle de
+CoppeliaSim permite configurar os atuadores no modo controle de
 velocidade. neste modo, o cliente \textit{zmqRemoteApi} é capaz de enviar
 um sinal em radianos por segundo, o qual é aplicado instantaneamente.
 O modelo conta com sensores para odometria como giroscópio e acelerômetro
@@ -77,10 +77,11 @@ do robô a colisões e toda dinâmica da simulação o modelo utilizado
 
 
 \section{Coleta de dados para o modelo cinemático}
-Tendo o robô modelado, a simulação configurada, então foi criado
-um algoritmo que fazia o robô andar aleatoriamente pelo cenário ao mesmo
-tempo que se coletava a posição e orientação do robô em relação ao referencial
-global. O pseudo código pode ser observado no Algoritmo \ref{coleta:de:dados:}
+Para coletar dados que serão utilizados pelo sistema de aprendizado de máquina
+foi criado um algoritmo que fazia o robô se mover aleatoriamente pelo cenário.
+Durante o movimento aleatório era coletado dados do robô.
+Os dados eram: a posição, orientação do robô em relação ao referencial global e
+as velocidades angulares das rodas. O pseudo código pode ser observado no Algoritmo \ref{coleta:de:dados:}
 
 \begin{algorithm}[H]
     \label{coleta:de:dados:}
@@ -133,22 +134,23 @@ O parâmetro $K$ do algoritmo foi criado para que o robô não bata na parede
 da simulação, ele foi encontrado fazendo um teste empírico, mostrando que
 após 20 passos  com o robô caminhando em linha reta, o robô bate na parede,
 por tanto nos nossos testes $K = 18$. Um princípio foi adotado na coleta
-de dados: o robô deve-se mover lentamente em todas a direções, sabendo do
-fato que a velocidade linear máxima do robô é 0,8 metros por segundo,
-por tanto foi adotado que velocidade linear máxima da coleta seria de 
-0,165 metros por segundo, esse número foi adotado por ser significantemente,
-inferior a 0,8  e ser obtido aplicando uma velocidade angular nas rodas de 2
-radianos por segundo. Na prática são gerados
-dois números aleatórios de distribuição uniforme entre 0 e 1 e multiplicado por
-2, $V_{MAX} = 2$. O simulador retorna valores de posições $x$,$y$ em metros
-que variam de -2,5 até 2,5 metros, já a orientação do robô é medida em radianos
-que variam de $-\pi$ até $\pi$.
-%0,0825
+de dados: o robô deve-se mover lentamente em todas a direções.
+Essa estrategia é para evitar quebrar ou danificar o robô durante a coletada
+de dados. Com esse principio em mente foi adotado uma velocidade linear
+máxima para o robô de 16 centímetros por segundo. Na pratica isso significa
+que será gerado dois números aleatórios de 0 até 2,
+onde 2 é o valor da velocidade angular maxima $V_{MAX}$ das rodas.
+As leituras de posição do robô retorna valores entre 
+-2,5 até 2,5 metros.
+A leitura da orientação do robô retorna um valor em radianos que varia entre
+$-\pi$ até $\pi$.
+
+
 \section{Modelagem de parâmetros de redes neurais artificiais}
 Atualmente \textit{Frameworks} de aprendizado máquina supervisionado
-têm evoluído bastante, uma das principais técnicas que revolucionou a
+têm evoluído bastante. Uma das principais técnicas que revolucionou a
 área de aprendizado de máquina é uma estrutura de dados chamada grafo
-de computação, ele é o um grafo direcionado e acíclico de operações com
+de computação. Ele é o um grafo direcionado e acíclico de operações com
 tensores, onde um nó pode ser um tensor ou uma função que opera sobre
 tensores. A figura \ref{fig:grafo:computacional} é um exemplo de
 grafo de computação que foi retirada do livro \cite{chollet2021deep},
@@ -162,7 +164,7 @@ os parâmetros da rede neural artificial.
     \caption{grafo de computação}
 \end{figure}
 
-Sabendo que cada uma das duas rodas segue as equações:
+Como dito no capítulo \ref{Cap:Teoria}, cada uma das duas rodas segue as equações:
 \begin{align}
     \frac{1}{r}
     \begin{bmatrix}
@@ -176,13 +178,24 @@ Sabendo que cada uma das duas rodas segue as equações:
     \dot{\xi}
     = 0 
 \end{align}
-Através dessa estrutura de dados e das equações, foi
-modelado os parâmetros de uma rede neural artificial,
-onde $\alpha$,$\beta$,$r$,$l$ são seus parâmetros,
-$\dot{\xi}$ a entrada do modelo e $\phi$ e $0$  são a saídas desejadas.
+onde $\dot{\xi}$ é o vetor de velocidades do robô. Sabendo que o robô possui duas rodas de acionamento diferencial
+podemos obter a seguinte matriz $W$ :
+\begin{flalign}\label{eq:matriz:cinematica}
+    W =
+    \begin{bmatrix}
+        \frac{\sin(\alpha_{1,1} + \beta_{1,1})}{r_1} &  \frac{-\cos(\alpha_{1,1} + \beta_{1,1})}{r_1} & \frac{-l\cos(\beta_{1,1})}{r_1} \\
+        \frac{\sin(\alpha_{2,1} + \beta_{2,1})}{r_2} &  \frac{-\cos(\alpha_{2,1} + \beta_{2,1})}{r_2} & \frac{-l\cos(\beta_{2,1})}{r_2}\\
+        \cos(\alpha_{1} + \beta_{1}) &  \sin(\alpha_{1} + \beta_{1}) &  l_1\sin(\beta_{1}) \\
+        \cos(\alpha_{2} + \beta_{2}) &  \sin(\alpha_{2} + \beta_{2})  &  l_2\sin(\beta_{2})\\
+    \end{bmatrix} 
+\end{flalign}
+onde $\alpha_1$,$\beta_1$,$l_1$ e $r_1$ são os parâmetros da roda esquerda
+e $\alpha_2$,$\beta_2$,$l_2$ e $r_2$ são os parâmetros da roda direita.
+Portanto foi modelado um grafo computacional que seja equivalente
+a matriz $W$ da equação \ref{eq:matriz:cinematica}.
 O grafo de computação com essas operações é representado por essas equações:
 
-\begin{align}
+\begin{align}\label{eq:grafo:computacional}
     \gamma = \alpha + \beta \\
     \cos_{\gamma} = \cos(\gamma) \\
     \sin_{\gamma} = \sin(\gamma) \\
@@ -190,7 +203,7 @@ O grafo de computação com essas operações é representado por essas equaçõ
     l_{0} = l\sin(\beta) \\
     W_{\phi_1} = \frac{\sin_{\gamma}}{r} \\
     W_{\phi_2} = \frac{-\cos_{\gamma}}{r} \\
-    W_{\phi} = \textbf{tensor\_concat\_h}(_{\phi_1},_{\phi_2}, l_{\phi})\\
+    W_{\phi} = \textbf{tensor\_concat\_h}(W_{\phi_1},W_{\phi_2}, l_{\phi})\\
     W_{0} = \textbf{tensor\_concat\_h}(\cos_{\gamma},\sin_{\gamma},  l_{0}) \\
     W = \textbf{tensor\_concat\_v}( W_{\phi}, W_{0} ) \\
     y_{\textbf{pred}} =  W \times  \dot{\xi} 
@@ -237,8 +250,8 @@ e \textbf{tensor\_concat\_v} junta os tensores verticalmente:
 \end{bmatrix}
 \end{align}
 Perceba que $W_{\phi}$ representa as equações das rodas, onde
-o valor desejado são as velocidades angulares $\phi_1,\phi_2$ das rodas:
-
+o valor desejado são as velocidades angulares $\phi_1,\phi_2$ das rodas,
+ou seja, $W_{\phi} \times \dot{\xi} = [\phi_{1},\phi_2]^{T} $
 \begin{align}
     W_{\phi} = 
     \begin{bmatrix}
@@ -246,16 +259,37 @@ o valor desejado são as velocidades angulares $\phi_1,\phi_2$ das rodas:
         \frac{\sin(\alpha_{2,1} + \beta_{2,1})}{r_2} &  \frac{-\cos(\alpha_{2,1} + \beta_{2,1})}{r_2} & \frac{-l\cos(\beta_{2,1})}{r_2}
     \end{bmatrix}
 \end{align}
-
-Na prática estamos fazendo uma regressão não linear para encontrar
-os parâmetros de uma transformação linear, então podemos também pensar em
-grafo de computacional mais simples semelhante a
-figura \ref{fig:grafo:computacional} mas sem o parâmetros $b$, 
-que encontra a melhor transformação
-linear que satisfaça o conjunto de dados coletados,
-Neste caso podemos modelar o grafo de maneira mais simples: $\phi=W \times \dot{\xi}$,
-onde cada peso é $W_{i,j}$ é encontrado separadamente. Ambos os modelos foram
-treinados e foram discutidos na sessão de experimentos e resultados.
+e $W_0$ representa a parte das equações das rodas cujo o valor desejado
+é 0, ou seja, $W_{\phi} \times \dot{\xi} = [0,0]$.
+\begin{align}
+    W_{0} = 
+    \begin{bmatrix}
+        \cos(\alpha_{1} + \beta_{1}) &  \sin(\alpha_{1} + \beta_{1}) &  l_1\sin(\beta_{1}) \\
+        \cos(\alpha_{2} + \beta_{2}) &  \sin(\alpha_{2} + \beta_{2})  &  l_2\sin(\beta_{2})
+    \end{bmatrix}
+\end{align}
+Perceba que concatenando verticalmente a matriz $W_{\phi}$ e $ W_{0}$ temos a matriz $W$
+Da equação \ref{eq:matriz:cinematica}. 
+Os tensores: $\alpha =[\alpha_1,\alpha_2]$,
+$\beta=[\beta_1,\beta_2]$ , $l=[l_1,l_2]$ e $r=[r_1,r_2]$
+da sequência de equações \ref{eq:grafo:computacional}.
+São esses parâmetros que são minimizados por meio dos algoritmos RMSprop
+e Backpropagation. Na prática
+estamos fazendo uma regressão não linear
+para encontrar os parâmetros de uma transformação linear, então podemos também
+pensar em grafo de computacional mais simples e semelhante a
+figura \ref{fig:grafo:computacional} mas sem o parâmetros $b$.
+Ou seja, podemos encontrar a matriz $W_l$:
+\begin{align}
+    W_l = 
+    \begin{bmatrix}
+        w_{1,1} &  w_{1,2} &  w_{1,3} \\
+        w_{2,1} &  w_{2,2} &  w_{2,3}
+    \end{bmatrix}
+\end{align}
+onde $W_l \times \dot{\xi} = [\phi_{1},\phi_2]^{T}$.
+Ambos os modelos foram treinados e foram discutidos na
+sessão de experimentos e resultados.
 
 
 \section{pré-processamento dos dados}
@@ -330,14 +364,17 @@ O pseudo código do pré-processamento pode ser observado no Algoritmo \ref{pre:
 
 Perceba que após a leitura dos dados de entrada é feita uma aproximação da
 velocidade angular e linear do robô através das variação de deslocamento
-sobre variação de tempo, também ao calcular a variação da orientação do robô
+sobre variação de tempo. Ao calcular a variação da orientação do robô
 é verificado se a diferença angular resultante $\Delta \theta$ é a menor.
- É importante salientar que $N_a$
+Foi observado que deixar variação da orientação do robô entre
+$-\pi$ e $\pi$ torna o conjunto de dados mais fácil de ser aprendido.  
+É importante salientar que $N_a$
 é um número de amostras coletadas, este número pode ser recuperado através
 do tamanho de um dos vetores: $x_1,y_1,\theta_{1},t_1,\phi_l,\phi_r,x_2,y_2,\theta_{2},t_2$.
 Como dito anteriormente, foram testados dois modelos, um modelo mais complexo
 que envolve modelagem dos parâmetros da rede através das equações das rodas
 e outro modelo mais simples que busca encontrar uma transformação linear
-para os conjunto de dados, quando é realizado o treinamento do modelo complexo
-são adicionados mais dois vetores de zeros á saída do modelo cinemático, zeros
+para os conjunto de dados. Quando é realizado o treinamento do modelo
+cujo o grafo computacional é mais complexo.
+São adicionados mais dois vetores de zeros á saída do modelo cinemático, zeros
 que são esperados pelas equações das rodas. 

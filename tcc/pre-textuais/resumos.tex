@@ -12,21 +12,21 @@
 % para numeração seja outro.
 \mychapterast{Resumo}
 O principal objetivo deste trabalho é criar um  sistema de
-controle para o andador robótico inteligente que seja capaz de
-posicionar o robô em uma posição em um ambiente livre de obstáculos,
-também  este trabalho visa estudar e avaliar algoritmos de aprendizado
-de máquina na elaboração do controlador. Primeiro foi feito um levantamento
-literário sobre a utilização aprendizado de máquina para criação de
-controladores cinemáticos em robôs moveis de acionamento diferencial,
-segundo foi construído uma versão do robô no simulador Coppeliasim,
-terceiro foi projetado um controlador cinemático, onde dois modelos
+controle para um andador robótico inteligente que seja capaz de
+posicionar o robô em uma posição em um ambiente livre de obstáculos.
+Este trabalho visa estudar e avaliar algoritmos de aprendizado
+de máquina na elaboração de um sistema de controle cinemático.
+Primeiro foi feito um levantamento literário sobre a utilização de
+aprendizado de máquina para criação de controladores cinemáticos em robôs moveis de acionamento
+diferencial. Segundo foi construído uma versão do robô no simulador Coppeliasim.
+Terceiro foi projetado um controlador cinemático, onde dois modelos
 cinemáticos foram obtidos através da modelagem dos parâmetros de uma
 rede neural artificial utilizando as equações que limitam o movimento
-cinemático do robô, um modelo faz uma regressão não linear dos
+cinemático do robô. Um modelo faz uma regressão não linear dos
 parâmetros das equações, já outro modelo realiza uma regressão linear.
 Os dados utilizados para o treinamento da rede são obtidos
 através da criação de  algoritmos de coleta de dados e pré-processamento.
-Já no controlador utiliza uma abordagem
+Já o controlador utiliza uma abordagem
 clássica que possui  dois controladores
 Proporcionais, integrais, derivativos (P.I.D),
 onde ambos os parâmetros dos P.I.Ds foram obtidos empiricamente.
@@ -36,23 +36,23 @@ dados de testes que foi utilizado para o cálculo do erro quadrático
 médio para todos os modelos cinemáticos.
 Para avaliar todo o sistema foi posicionado um alvo e observado o robô no 
 seu trabalho em chegar até alvo mensurando a distância do robô até o
-alvo e o seu angulo ao longo do tempo, o alvo foi posicionado em 4 lugares
-diferentes. Os resultados do erro quadrático médio e os
+alvo e o seu angulo ao longo do tempo. Os resultados do erro quadrático médio e os
 gráficos de distância e angulo sobre o tempo 
 mostraram que os dois modelos cinemáticos são equivalentes ao modelo
 analítico. Comparando os parâmetros do modelo que realiza a
 regressão não linear com o modelo analítico,
-percebe-se os parâmetros como raio da roda e a distância entre as rodas,
+percebe-se os parâmetros como os raios das rodas e a distância entre as rodas,
 se aproximaram da solução analítica, já para os ângulos das rodas foram
 encontrados outros valores que quando somados se aproximam da solução
 analítica. Foi concluído durante o levantamento literário que
-utilizar a abordagem clássica é a melhor opção do que soluções com
-aprendizado de máquina devido ao uso de memória e,
+utilizar a abordagem clássica para criar um controlador é a melhor opção do
+que soluções com aprendizado de máquina devido ao uso de memória e
 processamento com ambas soluções apresentando resultados equiparáveis.
-Foi concluído que projetar o controlador cinemático encontrando o modelo
-de forma analítica é mais simples do que usando algoritmos de aprendizado
-de máquina, no entanto aplicar a modelagem  de sistemas para criar um
-modelo de rede neural artificial resultou em um desempenho equivalente
+Foi concluído que encontrar o modelo cinemático de forma analítica é mais
+simples do que usando algoritmos de aprendizado
+de máquina, no entanto aplicar a modelagem  de sistemas para encontrar
+os números de camadas e funções de ativação de uma rede neural artificial
+resultou em um modelo equivalente
 a solução analítica.
 
 
