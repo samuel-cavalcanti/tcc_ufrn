@@ -9,11 +9,11 @@ de um modelo cinemático para o robô. O primeiro experimento foi o
 treinamento de um modelo de rede neural simples, onde o algoritmo
 de aprendizado supervisionado deve buscar uma transformação linear,
 que mapeia velocidade linear e angular do robô para as velocidades
-angulares das rodas sem levar em consideração as equações das rodas,
-o segundo experimento é o treinamento de um modelo cujo os parâmetros
+angulares das rodas sem levar em consideração as equações das rodas.
+O segundo experimento é o treinamento de um modelo cujo os parâmetros
 são constantes das equações das rodas, onde o algoritmo de aprendizado
 de máquina deve realizar uma regressão não linear para encontrar
-estes parâmetros, por fim é resolvida analaticamente a cinemática
+estes parâmetros. Por fim é resolvida analaticamente a cinemática
 com a finalidade de comparar com os dois modelos. Em relação ao controlador,
 foi implementado o controlador Vieira e encontradas as constantes do P.I.D
 empiricamente.
@@ -32,7 +32,7 @@ bastante performáticas. Em nosso Experimentos a execução do modelo
 em \textit{Rust} é em média 2 vezes mais rápido do que a mesma implementação
 em \textit{Python}. Para se chegar a esse número foi executado 10 mil vezes o cálculo
 da cinemática, em um \textit{notebook} com processador de 4 núcleos \textit{AMD Ryzen 5 2500U},
-sem placa de vídeo dedicada. Para a criação dos modelos foi executado o
+sem placa de vídeo dedicada. Para o treinamento dos modelos foi executado o
 algoritmo de coleta de dados obtendo conjunto com 10 mil
 pontos. Durante o treinamento é dividido este conjunto de dados
 onde 60\% dos dados são utilizados para treinamento e 40\% foi utilizado
@@ -59,7 +59,7 @@ foi o erro quadrático médio.
 
 Para teste dos modelos cinemáticos foram coletados mais 10 mil pontos,
 mas dessa vez com o robô podendo variar a velocidade angular das rodas
-para até 5 vezes o raio da roda, ou seja $V_{MAX}=5$, no entanto ao invés
+para até 5 vezes o raio da roda, ou seja, $V_{MAX}=5$. No entanto ao invés
 de coletar dados de posição, foi extraído do simulador diretamente a
 velocidade do robô.
 
@@ -91,19 +91,19 @@ tabela \ref{table:mse:test}
         0,0027 & modelo analítico \\
         \hline
     \end{tabular}
-    \caption{teste dos modelos}
+    \caption{Erro quadrático médio dos modelos no conjunto de testes}
 \end{table}
 
 Como se sabe o significado físico dos parâmetros do modelos gerados
 através de algoritmos de aprendizado de máquina, então na figura
-\ref{fig:parametros:da:cinemantica} mostra os valores encontrados
-sendo $W_{A}$ os valores do calculo analítico, $W_{K}$ e $W_{L}$ 
+\ref{fig:parametros:da:cinemantica} mostra os valores encontrados.
+Sendo $W_{A}$ os valores do calculo analítico, $W_{K}$ e $W_{L}$ 
 são os valores obtidos através da regressão não linear e linear
 respectivamente. A tabela \ref{table:param:kinematic} mostra os valores
-dos parâmetros das rodas após a regressão não linear, e a tabela
+dos parâmetros das rodas após a regressão não linear. A tabela
 \ref{table:param:analytic} mostra os valores dos parâmetros da
-solução analítica, em ambas as tabelas os ângulos estão medidos
-em graus, e os raio da roda $r$ e distância $l$ estão em metros.
+solução analítica. Ambas as tabelas os ângulos estão medidos
+em graus e os raios das rodas $r$ e as distâncias $l$ estão em metros.
  
 \begin{figure}[H]
     \label{fig:parametros:da:cinemantica}
@@ -237,38 +237,38 @@ Através desses dois fatos podemos dizer que os modelos são equivalentes.
 do treinamento é um sub conjunto do conjunto de testes.
 Algo o que nos dá segurança em aplicar o modelo em dados nunca vistos.
 Em aprendizado de máquina supervisionada
-muitas vezes é feita uma escolha em generalização e otimização. Onde um
+muitas vezes é feita uma escolha em generalização e otimização, onde um
 modelo mais otimizado ao conjunto de dados de treinamento tende a não ir
 bem e dados fora desse conjunto. No entanto ao modelarmos o sistema
 cinemático do robô ao mesmo tempo que modelamos os pesos de uma rede neural
-artificial. Mostramos que otimizar os parâmetros de uma rede neural modelada
+artificial mostramos que otimizar os parâmetros de uma rede neural modelada
 estamos também aumentando a sua generalização.
 Comparando os modelos de aprendizado, podemos observar que a regressão
-linear convergiu cento e sessenta mil iterações,A regressão não linear
+linear convergiu após cento e sessenta mil iterações, a regressão não linear
 parou de reduzir o erro com trinta mil iterações.  Apesar do tempo de
 treinamento está fortemente relacionado om os valores iniciais da rede,
 A regressão não linear teve mais duas equações iguais a zero, algo que ajudou
 a guiar o erro mais rápido. Outro ponto interessante de se notar na figura
 \ref{fig:parametros:da:cinemantica}
 é que os pesos da regressão linear afirmam existir uma contribuição negativa
-de velocidade linear no eixo y do robô. Algo também observado no modelado de
+de velocidade linear no eixo y do robô algo também observado no modelado de
 regressão não linear, só que com valores inferiores devido as equações.
 Talvez estes valores deve-se a aproximação da velocidade por meio da variação
 de posição sobre variação do tempo ou algum fator dinâmico da simulação.
 Comparando os valores das tabelas \ref{table:param:kinematic} e \ref{table:param:analytic}
-podemos perceber que a rede convergiu o angulo $\gamma = \alpha + \beta$.
-Uma vez que o gamma analítico é  $\gamma_{A} = 90$ e o gamma do modelo
-de regressão não linear foi de $\gamma_{K} = 89$. O modelo de aprendizado
+podemos perceber que a rede convergiu o angulo $\gamma = \alpha + \beta$,
+uma vez que o gamma analítico é  $\gamma_{A} = 90^\circ$ e o gamma do modelo
+de regressão não linear foi de $\gamma_{K} = 89^\circ$. O modelo de aprendizado
 de máquina é resultado dos seus dados, como existe uma pequena velocidade
 no eixo y do robô, a rede reajustou os parâmetros $l$ e $\beta$ de modo que
-representa-se os dados, apensar do modelo não ter encontrado os ângulos,
-$\beta, \alpha$ próximos da solução analítica, os raios da rodas estão
-com valores muito próximos e a distância $l$ está a uma diferença de
+representa-se os dados. Apensar do modelo não ter encontrado os ângulos:
+$\beta, \alpha$, próximos da solução analítica, os raios da rodas estão
+com valores muito próximos e as distâncias do centro do robô até as rodas está a uma diferença de
 centímetros da solução analítica. Este trabalho também busca uma solução
 que pode-se sem implementada em um computador com limitação de
 processamento e memória. Se consideramos que o treinamento poder ser
 realizado em outro computador, onde o robô enviaria os dados.
-Por tanto se consideramos só o sistema de controle, o computador apenas
+Portanto se consideramos só o sistema de controle, o computador apenas
 executará o algoritmo do  P.I.D mais a multiplicação de uma matriz da
 cinemática que contem 6 elementos. Então o computador utilizado não irá
 precisar de muita memória e processamento.

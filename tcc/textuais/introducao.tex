@@ -8,24 +8,32 @@ Um Andador Robótico Inteligente foi projetado e implementado
 por Alberto Tavares de Oliveira \cite{oliveira2022projeto},
 com objetivo de ajudar pessoas com mobilidade reduzida. Alberto aponta
 diversos fatores que podem provocar uma redução da mobilidade, além do 
-envelhecimento da população mundial, o envelhecimento tende a agravar
-condições de mobilidade . Apesar da construção,
+envelhecimento da população mundial. Apesar da construção,
 o robô não possui um sistema de controle. Segundo \cite{siegwart2011introduction}
 um sistema de controle de um robô móvel é um sistema que recebe
-como entrada uma posição e orientação do robô desejada e movimenta o robô
-para esta posição e orientação. Este trabalho visa utilizar
-aprendizado de máquina para a construção de um sistema de controle.
+como entrada uma posição e orientação desejada e movimenta o robô
+para esta posição e orientação. Um sistema de controle cinemático possui
+três componentes: um controlador, um modelo cinemático do robô e sensor de
+posição e orientação. O controlador é o componente responsável
+por receber uma posição e orientação desejada e enviar sinais de velocidade linear 
+e angular para o modelo cinemático, sabendo que as velocidades levaram o 
+robô até a posição e orientação desejada. O modelo cinemático é uma função
+capaz de relacionar a velocidade linear e angular do robô para as velocidades
+das rodas. Aplicando as velocidades das rodas no robô, o movimento do
+robô é percebido pelo sensores de posição e orientação. Dependendo do tipo de controlador
+a informação dos sensores pode ou não ser utilizada pelo controlador. Este trabalho visa
+utilizar aprendizado de máquina para a construção de um sistema de controle cinemático.
 Aprendizado de máquina é todo sistema de computador que é capaz de
 automaticamente melhorar o seu desempenho em resolver um problema através
-da experiência \cite{mitchell1990machine}
+da experiência \cite{mitchell1990machine}.
 O desejo de utilizar sistemas de aprendizado de máquina é devido ao seu sucesso
 em
 resolver jogos como o sistema alphazero \cite{silver2017mastering}, muzero
-\cite{schrittwieser2020mastering} e outros modelos de aprendizado de máquina
+\cite{schrittwieser2020mastering} e outros sistemas de aprendizado de máquina
 que resolvem a cinemática de braços robóticos como \cite{cavalcanti2017self}
-ou modelos ainda mais complexos que resolvem a dinâmica de um robô humanoide
+ou sistemas ainda mais complexos que resolvem a dinâmica de um robô humanoide
 \cite{phaniteja2017deep}. O estudo da cinemática é o estudo do comportamento
-básico de como um sistema mecânico se comporta e a dinâmica é o entendimento
+básico de como um sistema mecânico se comporta. A dinâmica é o entendimento
 do comportamento perante as forças aplicadas em um sistema mecânico. Em contexto
 de robôs moveis o entendimento da cinemática é fundamental para criação de um
 sistema de controle \cite{siegwart2011introduction}. Este trabalho tem como
@@ -36,14 +44,15 @@ inteligente que facilite a locomoção de pessoas com mobilidade reduzida.
 \section{Objetivos}
 
 O principal objetivo deste trabalho é criar um  sistema de
-controle cinemático para o andador inteligente, sabendo que o sistema será
-embarcado em um minicomputador, o sistema de controle tem que ser
-projetado para utilizar pouca e memória e processamento.
+controle cinemático para o andador inteligente. O sistema deverá
+ser pensado para utilizar pouca e memória e processamento, de modo
+que ele futuramente possa ser embarcado em um minicomputador.
 Também este trabalho visa utilizar e avaliar o desempenho de algoritmos
 de aprendizado de máquina para resolver a cinemática do robô. Tendo em
 vista possíveis dificuldades encontradas em avaliar e utilizar o robô real,
-um dos objetivos deste trabalho é criar uma versão simulada do robô e
-testar e avaliar o sistema de controle cinemático nesta versão.
+um dos objetivos deste trabalho é criar uma versão simulada do robô.
+Todos os testes e avaliações do sistema de controle cinemático deveram
+ser feitas no simulador.
 
 \section{organização do trabalho}
 
@@ -51,7 +60,7 @@ Este trabalho está organizado da seguinte forma, no capítulo \ref{Cap:Teoria}
 está a revisão teoria necessária para o entendimento desse trabalho. O capítulo
 \ref{Cap:TrabalhosRelacionados} é revisão bibliográfica que inspirou este
 trabalho. No capítulo \ref{Cap:Desenvolvimento} é dito em detalhes o que foi
-utilizado, as minhas contribuições para futuros trabalhos inspirados neste e
+utilizado, as minhas contribuições e
 como foi desenvolvido o sistema de controle cinemático. No capítulo
 \ref{Cap:ExperimentosResultados}
 está os experimentos feitos com o sistema de controle cinemático

@@ -5,21 +5,23 @@
 \mychapter{Desenvolvimento}
 \label{Cap:Desenvolvimento}
 
-O principal objetivo desse trabalho é criar um controlador para
-um Andador inteligente, sendo este controlador pensado para requerer
+O principal objetivo desse trabalho é criar um sistema de controle cinemático para
+um Andador inteligente, sendo este  sistema de controle cinemático pensado para requerer
 pouca memória e processamento. Também visa-se estudar e aplicar algoritmos
 de aprendizagem de máquina de modo a gerar um modelo cinemático do robô.
 O modelo cinemático é o maior desafio deste trabalho, pois como será visto
 mais adiante foi utilizado uma abordagem que mescla a solução analítica com
 algoritmos de aprendizado de máquina para gerar um modelo de um robô com
 acionamento diferencial. Outra contribuição deste trabalho é o modelo do
-robô simulado, onde o controlador e o modelo cinemático foram avaliados.
-O desenvolvimento do controlador foi dividindo em quatro partes. A primeira
-é a construção da simulação do robô. Segunda foi a coleta de dados para
-a construção do modelo cinemático. Terceira foi  modelado
-uma rede neural de modo que seus parâmetros se traduzissem nos parâmetros
-da cinemática, quarta e ultima parte conta o desenvolvimento
-do pré-processamento dos dados. 
+robô simulado, onde o controlador e os modelos cinemáticos foram avaliados.
+O desenvolvimento do  sistema de controle cinemático foi dividindo em quatro
+partes. A primeira é a construção da simulação do robô.
+Segunda foi o desenvolvimento do algoritmo de coleta de dados necessária
+para o treinamento dos modelos cinemáticos. Terceira foi  modelado
+duas redes neurais de modo que seus parâmetros se traduzissem nos parâmetros
+da cinemática. Quarta e ultima parte conta o desenvolvimento
+do algoritmo do pré-processamento dos dados que transforma o conjunto
+de dados coletados em um conjunto de dados prontos para o treinamento. 
 
 
 \section{construção do robô em um ambiente simulado}
@@ -29,7 +31,7 @@ Uma das contrições deste trabalho foi a criação de um cliente
 \textit{zmqRemoteApi} para a linguagem de programação \textit{Rust}
 que se comunica com o simulador. \textit{Rust} foi adotada pois
 é capaz de produzir um código tão performático quanto C/C++, além
-de possui um gerenciador de pacotes que facilita o desenvolvimento
+de possui um gerenciador de pacotes padrão que facilita o desenvolvimento
 futuro de novas aplicações e reutilização de códigos. O ambiente
 simulado possui o formato quadrado com um lado $l$ de 5 metros.
 Além do robô, o ambiente possui um alvo, o qual o robô deve
@@ -64,21 +66,23 @@ e uma câmera RGB-D do modelo Kinect, no entanto os sensores não foram
 utilizados neste trabalho.
 Foram utilizados funções do próprio simulador para coletar posição e 
 orientação do robô em relação ao referencial global.
-Segundo a documentação do CoppeliaSim na parte da dinâmica
+Segundo a documentação do CoppeliaSim na parte da dinâmica,
 devemos priorizar a montagem do robô com peças primitivas do próprio
-simulador, portanto regiões que deveriam ser mais arredondadas foram
+simulador. Portanto regiões que deveriam ser mais arredondadas foram
 aproximadas por retângulos de modo que seja possível ser utilizada uma
 primitiva. Para a detecção de colisão ou para as detecções realizadas
-pelos sensores,
-como câmeras e sonars o modelo
-observado é o da figura \ref{fig:cenario:completo}.Para o comportamento 
-do robô a colisões e toda dinâmica da simulação o modelo utilizado
-é o da figura \ref{fig:dinamica:robo}.
+pelos sensores,como: câmeras e sonars, o modelo percebido é o da figura
+\ref{fig:cenario:completo}. Para o comportamento do robô a colisões e toda dinâmica da simulação
+o modelo percebido é o da figura \ref{fig:dinamica:robo}. O robô simulado é a junção dos dois
+modelos, onde durante a simulação o modelo da dinâmica está configurado para ser invisível.
+Já o modelo de percepção é um objeto 3D sem dinâmica a qual sua posição e orientação
+está ligada a posição e orientação do modelo dinâmico. Quando o modelo dinâmico se
+move pelo ambiente simulado, o modelo visual acompanha. 
 
 
 \section{Coleta de dados para o modelo cinemático}
 Para coletar dados que serão utilizados pelo sistema de aprendizado de máquina
-foi criado um algoritmo que fazia o robô se mover aleatoriamente pelo cenário.
+foi criado um algoritmo que faz o robô se mover aleatoriamente pelo cenário.
 Durante o movimento aleatório era coletado dados do robô.
 Os dados eram: a posição, orientação do robô em relação ao referencial global e
 as velocidades angulares das rodas. O pseudo código pode ser observado no Algoritmo \ref{coleta:de:dados:}
@@ -155,7 +159,8 @@ tensores, onde um nó pode ser um tensor ou uma função que opera sobre
 tensores. A figura \ref{fig:grafo:computacional} é um exemplo de
 grafo de computação que foi retirada do livro \cite{chollet2021deep},
 onde $x$ e $y_{true}$ são as variáveis de entrada, e w,b são
-os parâmetros da rede neural artificial. 
+os parâmetros da rede neural artificial. O grafo computacional
+representa um modelo: $W \times x + B$ para uma função erro $loss$ qualquer.
 
 \begin{figure}[H]
     \label{fig:grafo:computacional}
@@ -269,16 +274,16 @@ e $W_0$ representa a parte das equações das rodas cujo o valor desejado
     \end{bmatrix}
 \end{align}
 Perceba que concatenando verticalmente a matriz $W_{\phi}$ e $ W_{0}$ temos a matriz $W$
-Da equação \ref{eq:matriz:cinematica}. 
+da equação \ref{eq:matriz:cinematica}. 
 Os tensores: $\alpha =[\alpha_1,\alpha_2]$,
 $\beta=[\beta_1,\beta_2]$ , $l=[l_1,l_2]$ e $r=[r_1,r_2]$
 da sequência de equações \ref{eq:grafo:computacional}.
-São esses parâmetros que são minimizados por meio dos algoritmos RMSprop
+São esses parâmetros que são encontrados por meio dos algoritmos RMSprop
 e Backpropagation. Na prática
 estamos fazendo uma regressão não linear
 para encontrar os parâmetros de uma transformação linear, então podemos também
 pensar em grafo de computacional mais simples e semelhante a
-figura \ref{fig:grafo:computacional} mas sem o parâmetros $b$.
+figura \ref{fig:grafo:computacional} mas sem o parâmetro $b$.
 Ou seja, podemos encontrar a matriz $W_l$:
 \begin{align}
     W_l = 
@@ -294,9 +299,10 @@ sessão de experimentos e resultados.
 
 \section{pré-processamento dos dados}
 A coleta de dados nos fornece dados de posição, orientação, velocidade angular
-das rodas do robô e tempo de simulação, portanto temos que transformar os dados
+das rodas do robô e tempo de simulação. Portanto temos que transformar os dados
 de posição e orientação e tempo, em informação de velocidade linear e angular
-do robô, sendo que a velocidade linear tem que está no referencial do robô.
+do robô. Sabendo que a velocidade linear está no referencial global, então
+temos que mudar o referencial para o do robô.
 O pseudo código do pré-processamento pode ser observado no Algoritmo \ref{pre:processamento:}
 
 \begin{algorithm}[H]
@@ -363,11 +369,12 @@ O pseudo código do pré-processamento pode ser observado no Algoritmo \ref{pre:
 \end{algorithm}
 
 Perceba que após a leitura dos dados de entrada é feita uma aproximação da
-velocidade angular e linear do robô através das variação de deslocamento
-sobre variação de tempo. Ao calcular a variação da orientação do robô
-é verificado se a diferença angular resultante $\Delta \theta$ é a menor.
+velocidade angular e linear do robô através da variação angular sobre variação de tempo e
+variação de deslocamento sobre variação de tempo.
 Foi observado que deixar variação da orientação do robô entre
-$-\pi$ e $\pi$ torna o conjunto de dados mais fácil de ser aprendido.  
+$-\pi$ e $\pi$ torna o conjunto de dados mais fácil de ser aprendido.
+Portanto ao calcular a variação da orientação do robô é selecionado
+sempre a menor diferença angular resultante $\Delta \theta$.  
 É importante salientar que $N_a$
 é um número de amostras coletadas, este número pode ser recuperado através
 do tamanho de um dos vetores: $x_1,y_1,\theta_{1},t_1,\phi_l,\phi_r,x_2,y_2,\theta_{2},t_2$.

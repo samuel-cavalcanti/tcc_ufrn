@@ -5,9 +5,9 @@
 \mychapter{Fundamentação Teórica}
 \label{Cap:Teoria}
 Este trabalho envolve a cinemática de um robô móvel,
+algoritmos de aprendizado de máquina e
 a implementação de um controlador estabilizante
-que utiliza as leis de controle e
-algoritmos de aprendizado de máquina. Portanto esta seção
+que utiliza as leis de controle. Portanto esta seção
 visa explicar as partes fundamentais destas areas do conhecimento,
 que foram utilizada neste trabalho. Primeiro abordaremos o problema
 da cinemática focando em robôs moveis de acionamento diferencial,
@@ -22,7 +22,7 @@ angulares das $n$ rodas são: $\phi_0,\phi_1,\phi_2,...,\phi_n$.
 Uma cinemática direta $f$ de um robô móvel é a uma função que mapeia as
 velocidades
 angulares das rodas para a velocidade linear $v$ e velocidade angular $\omega$
-do robô, $f(\phi_0,\phi_1,\phi_2,...,\phi_n) \rightarrow v,\omega$. Já
+do robô, ou seja, $f(\phi_0,\phi_1,\phi_2,...,\phi_n) \rightarrow v,\omega$. Já
 a cinemática inversa $g$, mapeia a velocidade angular e linear do robô para
 um
 conjunto de velocidades angulares das rodas,
@@ -43,40 +43,41 @@ das rodas do robô. Para um robô com duas rodas de acionamento diferencial
 como mostrado na figura \ref{fig:robo:movel:acionamento:diferencial}
 as equações que regem o movimento dele são:
 
-\[
-\begin{bmatrix}
-    \sin(\alpha_{1} + \beta_{1}) &  -\cos(\alpha_{1} + \beta_{1}) &  -l_1\cos(\beta_{1})\\
-    \sin(\alpha_{2} + \beta_{2}) &  -\cos(\alpha_{2} + \beta_{2}) &  -l_2\cos(\beta_{2})\\
-\end{bmatrix}
-\begin{bmatrix}
-    v_x \\
-    v_y \\
-    \omega\\
-\end{bmatrix}
-=
-\begin{bmatrix}
-    r_0\phi_0 \\
-    r_1\phi_1 \\
-\end{bmatrix}
-\]
+\begin{equation}\label{eq:cinmeatica:1}
+    \begin{bmatrix}
+        \sin(\alpha_{1} + \beta_{1}) &  -\cos(\alpha_{1} + \beta_{1}) &  -l_1\cos(\beta_{1})\\
+        \sin(\alpha_{2} + \beta_{2}) &  -\cos(\alpha_{2} + \beta_{2}) &  -l_2\cos(\beta_{2})\\
+    \end{bmatrix}
+    \begin{bmatrix}
+        v_x \\
+        v_y \\
+        \omega\\
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        r_0\phi_0 \\
+        r_1\phi_1 \\
+    \end{bmatrix}
+\end{equation}
 
 
-\[
-\begin{bmatrix}
-    \cos(\alpha_{1} + \beta_{1}) &  \sin(\alpha_{1} + \beta_{1}) &  l_n\sin(\beta_{1}) \\
-    \cos(\alpha_{2} + \beta_{2}) &  \sin(\alpha_{2} + \beta_{2})  &  l_n\sin(\beta_{2})\\
-\end{bmatrix}
-\begin{bmatrix}
-    v_x \\
-    v_y \\
-    \omega\\
-\end{bmatrix}
-=
-\begin{bmatrix}
-    0 \\
-    0 \\
-\end{bmatrix}
-\]
+\begin{equation}\label{eq:cinmeatica:2}
+    \begin{bmatrix}
+        \cos(\alpha_{1} + \beta_{1}) &  \sin(\alpha_{1} + \beta_{1}) &  l_n\sin(\beta_{1}) \\
+        \cos(\alpha_{2} + \beta_{2}) &  \sin(\alpha_{2} + \beta_{2})  &  l_n\sin(\beta_{2})\\
+    \end{bmatrix}
+    \begin{bmatrix}
+        v_x \\
+        v_y \\
+        \omega\\
+    \end{bmatrix}
+    =
+    \begin{bmatrix}
+        0 \\
+        0 \\
+    \end{bmatrix}
+\end{equation}
+
 \begin{figure}[H]
     \label{fig:parametros:roda:fixa}
     \centering
@@ -133,14 +134,14 @@ foram retirados do livro \cite{siegwart2011introduction}
 \end{figure}
 
 
-No nosso caso o robô a ser modelado possui quatro rodas. Duas delas são
+No nosso caso, o robô a ser modelado possui quatro rodas. Duas delas são
 rodas de acionamento diferencial e as outras duas rodas são rodas castores.
 Uma imagem do robô pode ser vista na figura \ref{fig:andador:robotico:inteligente}.
 Apesar das rodas castores, contribuírem para o movimento, elas não restringem
 o movimento, portanto podemos entender o modelo cinemático do nosso robô
 como sendo uma transformação linear $W \times X = Y$, onde $X$ é o vetor
 de velocidades, e $W$ a matriz de valores constantes obtidas após resolver
-as equações.
+as equações: \ref{eq:cinmeatica:1} e \ref{eq:cinmeatica:2}.
 
 \begin{figure}[H]
     \[
@@ -221,17 +222,17 @@ a decida do gradiente é uma busca que visa encontrar
 a melhor matriz $M$ que minimiza uma função $L(M)$, basicamente a
 decida do gradiente parte do suposto que existe a sequência
 $M_0$, $M_1$, $M_2$, ..., $M_i$, $M_{i+1}$ até $M_k$, onde quando
-chegar até $M_k$, o ponto $L(M_k),M_k$ será um ponto de mínimo e a transição
+chegar até $M_k$, o ponto: $(L(M_k),M_k)$ será um ponto de mínimo da função $L$ e a transição
 entre o $M_{i}$ até $M_{i+1}$, segue a seguinte regra:
 
 \begin{equation}
     M_{i+1} = M_i -\alpha \nabla L(M_i)
 \end{equation}
 
-onde $\nabla L(W_i)$ é o gradiente da função $L(M)$ em relação a $M$ aplicado
+onde $\nabla L(W_i)$ é o gradiente da função $L$ em relação a $M$ aplicado
 a $M_i$ e $\alpha$ é um número que varia de 0 até 1,
 também conhecido com taxa de aprendizado. Uma variação desse algoritmo
-basicamente utilizado é chamado RMSprop, ele se inspira na ideia de momentum
+bastante utilizado é chamado RMSprop, ele se inspira na ideia de momentum
 da física  onde  é adicionado uma constante $m$ análoga a massa e uma grandeza
 vetorial $v_{\text{vel}}$ análoga a velocidade, criando uma nova equação de decida:
 
@@ -259,7 +260,9 @@ transformação geométrica $Y_{\text{pred}}= A \times X + B$, e uma definição
 erro como: $L=(Y_{\text{true}}- Y_{\text{pred}})^2$ podemos utilizar o algoritmo
 Backpropagation para encontrar os gradientes da função $L$ em relação a $A$
 e  $B$. Basicamente o Backpropagation executa automaticamente a regra da cadeia
-para encontrar os gradientes e com os gradientes podemos executar o RMSprop.
+para encontrar os gradientes e com os gradientes podemos executar o RMSprop,
+ou seja, $A_{i+1} = A_i -b_{t_a}$ e $B_{i+1} = B_i -b_{t_b}$. Onde $b_{t_a}$ e $b_{t_b}$
+são os valores de $b_{t}$ do RMSprop das respectivas matrizes $A$ e $B$.
 
 \begin{figure}[H]
     \begin{align*}
@@ -271,12 +274,13 @@ para encontrar os gradientes e com os gradientes podemos executar o RMSprop.
 
 \section{Controlador estabilizante Vieira}
 Controladores cinemáticos ou controladores de movimento, podem ser 
-divididos em dois tipos: seguidores de trajetória e estabilizante,
-controladores seguidores trajetória recebem como entrada um perfil
+divididos em dois tipos: seguidores de trajetória e estabilizante.
+Controladores seguidores trajetória produzem um perfil
 de caminho sobre o tempo, a qual o controlador envia sinais de
 velocidade linear e angular para o robô de modo que ele siga a
-trajetória idealizada. Controladores estabilizantes
-eles recebem como entrada um estado atual do robô e o estado desejado
+trajetória idealizada. 
+A trajetória é feita a partir da posição,orientação atual do robô e uma posição,orientação desejada.
+Controladores estabilizantes eles recebem como entrada um estado atual do robô e o estado desejado
 e buscam enviar sinais de velocidade linear e angular com o objetivo
 de minimizar o erro entre o estado atual e desejado. Neste trabalho
 foi utilizado um controlador estabilizante criado por Frederico

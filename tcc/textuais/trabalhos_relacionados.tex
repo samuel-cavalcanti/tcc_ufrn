@@ -6,7 +6,7 @@
 \label{Cap:TrabalhosRelacionados}
 Neste capítulo abordaremos os três principais artigos que influenciaram
 este trabalho. O primeiro artigo se trata de um algoritmo do estado
-da arte do aprendizado por reforço, o segundo e terceiro artigo são
+da arte do aprendizado por reforço. O segundo e terceiro artigo são
 trabalhos que buscaram criar um controlador usando aprendizado por reforço
 que rivaliza com os controladores que utilizam a abordagem clássica de controle.
 Estes dois últimos artigos foram determinantes para escolher o controlador
@@ -22,17 +22,17 @@ foi escrita na seção \ref{sec:conclusao:revisao:bibliografica}.
 
 MuZero é um sistema de aprendizado de máquina que utiliza algoritmos de
 aprendizado por reforço e aprendizado supervisionado para
-resolver jogos de atari, xadrez e Shogi também conhecido como
+resolver diversos jogos como: jogos de atari, xadrez e Shogi, também conhecido como
 xadrez japonês. O MuZero é um sistema com três componentes:
-Representação, dinâmica e predição. Representação é uma uma
+representação, dinâmica e predição. Representação é uma uma
 função $h_{\theta}$  que recebe $t$ observações 
-e cria uma Representação interna $s$, $s = h_{\theta}(o_1,...,o_t)$,
-onde $o$ é uma observação, onde uma observação pode ser entendia como sendo
+e cria uma representação interna $s$, $s = h_{\theta}(o_1,...,o_t)$,
+onde $o$ é uma observação. Uma observação $o_t$ pode ser entendia como sendo
 um vetor que contem todos os valores dos sensores em um instante $t$.
 A predição é uma função $f_{\theta}$ que recebe uma representação $s$
-e retorna uma vetor $v$ de tamanho $k$, onde um índice do vetor $v$ representa
-uma ação discreta e cada elemento do vetor $v$ é um valor que diz o quão bom
-seria tomar a decisão do seu respectivo índice,  $v[k] =  f_{\theta}(s)$.
+e retorna uma vetor $v$ de tamanho $k$, ou seja,  $v[k] =  f_{\theta}(s)$.
+Um índice do vetor $v$ representa uma ação discreta e cada elemento do vetor $v$ é um valor que diz o quão bom
+seria tomar a decisão do seu respectivo índice.
 Uma ação $a$, poderia ser o índice do maior
 valor de $v$ ou utilizar a busca em árvore como no método Monte Carlo
 através do modelo de dinâmica. O modelo de dinâmica é uma outra função
@@ -42,39 +42,48 @@ ou seja, $s^{k+1},r^{k+1}=  g_{\theta}(s^{k},a^k)$.
 
 
 \begin{figure}[H]
+    \label{fig:comparacao:muzero:sistema:classico}
     \centering
-    \includegraphics[scale=0.4]{figuras/muzero.pdf}
-    \caption{diagrama dos modelos do MuZero}
+    \includegraphics[scale=0.6]{figuras/muzero_controle_cinematico.pdf}
+    \caption{Comparação entre MuZero e um sistema clássico de controle}
 \end{figure}
 
-A importância do MuZero para este trabalho não se trata do modelo em si,
+A importância do MuZero para este trabalho não se trata do sistema em si,
 mas sim a forma como resolveu o problema, dividindo o sistema em componentes
-de forma muito semelhante a como é feito em teoria de controle, onde
-o modelo de predição  $f_{\theta}$ pode ser entendido algo
-análogo ao controlador, o  modelo dinâmico $g_{\theta}$ como a planta,
-e $h_{\theta}$ sendo os sensores, sendo $h_{\theta}$ o modelo
+de forma muito semelhante a como é feito em teoria de controle. Onde
+o modelo de predição  $f_{\theta}$ pode ser entendido como algo
+análogo ao controlador, o  modelo dinâmico $g_{\theta}$ como a planta
+e $h_{\theta}$ sendo os sensores. No entanto, sendo $h_{\theta}$ o modelo
 necessário  para que o sistema seja genérico o suficiente para jogar
-diferentes jogos. É importante destacar a diferença entre o controlador P.I.D
-que toma decisões a partir de $n$ instantes anteriores ($t_n,t_{n-1},...t_{0}$),
-já o $f_{\theta}$
-treinado a partir do método Monte Carlo toma decisões em $k$ instantes futuros ($t_n,t_{n+1},...t_{n+k}$)
-utilizando a função $g_{\theta}$ análoga á planta.
+diferentes jogos. Um diagrama ressaltando as semelhanças entre um sistema
+clássico de controle e MuZero pode ser observada na figura \ref{fig:comparacao:muzero:sistema:classico}.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.6]{figuras/sistema_classico_controle.pdf}
-    \caption{diagrama clássico de controle}
+    \includegraphics[scale=0.15]{figuras/monte_carlo.png}
+    \caption{Interação do método Monte Carlo com o modelo dinâmico $g_{\theta}$}
+    \label{fig:iteracao:metodo:monte:carlo}
 \end{figure}
+
+É importante destacar a diferença entre um controlador P.I.D
+e $f_{\theta}$. P.I.D toma decisões a partir de $n$ instantes anteriores ($t_n,t_{n-1},...t_{0}$).
+$f_{\theta}$ toma decisões em $k$ instantes futuros ($t_n,t_{n+1},...t_{n+k}$), pois ele é treinado
+a partir do método Monte Carlo que realiza busca em largura e profundidade em $k$ instantes futuros
+utilizando a função $g_{\theta}$. Um exemplo retirado do próprio artigo sobre a interação do método do Monte Carlo com $g_{\theta}$
+pode ser encontrada na figura \ref{fig:iteracao:metodo:monte:carlo}. 
 
 \section{Controlador de posição e aprendizado por reforço }
 \label{sec:controlador:posicao:aprendizado:reforco}
 Utilização de aprendizado por reforço para criação de controladores
-estabilizantes, foi observado em \cite{farias2020position}
-a qual mostrou que o algoritmo \textit{Q-learning} é capaz de aprender
+estabilizantes, foi observado em \cite{farias2020position}.
+O trabalho demonstrou que o algoritmo \textit{Q-learning} é capaz de aprender
 as regras de um controlador com restrições de velocidades linear e angular
-para  posicionar o robô em determinada posição, no entanto em seus
+para  posicionar o robô em determinada posição. No entanto em seus
 experimentos foram necessários 5 milhões de iterações para se ter um modelo
 inferior a um controlador que utiliza as leis clássicas de controle.
+No trabalho o controlador envia um sinal de velocidade linear
+constante e o \textit{Q-learning} foi utilizado para aprender a
+controlar a velocidade angular.
 
 \subsection{Q-learning}
 Uma Função ação-valor determina o quão bom 
@@ -83,7 +92,7 @@ $S_t$. \textit{Q-learning} é um algoritmo de aprendizado por reforço que
 busca aprender uma função ação-valor $Q$ que diretamente aproxima
 a função ação-valor ótima $Q^*$ independente do algoritmo utilizado
 para selecionar uma ação. O que faz o algoritmo aproximar a função ótima
-é o processo de atualização da função $Q$ seguindo a equação do \textit{Q-learning}:
+é o processo de atualização da função $Q$ seguindo a equação \textit{Q-learning}:
 
 \begin{equation} 
     Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha[R + \gamma  \max_aQ(S_{t +1},a) - Q(S_t,A_t)]
@@ -95,10 +104,9 @@ sendo como uma tabela, onde o estado $S$ e ação $A$ são indices. Em contexto 
 controladores estabilizantes para robôs moveis, o estado pode ser um
 valor de distância até o alvo discretizado e ação pode ser movimentos simples
 como girar para esquerda, direita, ir para frente ou ir de rê. Por fim o valor é
-número contínuo ou discreto derivado de uma função recompensa que poder
-a a variação de distância até o alvo observada após o movimento.
+número contínuo ou discreto derivado de uma função recompensa que pode ser
+a variação de distância até o alvo observada após o movimento.
 \textit{Q-learning} é apresentado em Algoritmo  \ref{Q-learning:}
-
 
 \begin{algorithm}[H]
     \label{Q-learning:}
@@ -147,11 +155,10 @@ regras de um controlador que posicione o robô em determinada
 posição e evite de obstáculos usando sensores ultrassônicos.
 Apesar do sucesso, o controlador gerado pelos algoritmos não envia
 os sinais de velocidades angulares diretamente para o modelo cinemático
-do robô, os sinais eram a entrada para o algoritmo de Braitenberg, um
-algoritmo que converte sinais de distância de obstáculos em velocidades
+do robô, os sinais eram a entrada para o algoritmo de desvio de obstáculos de Braitenberg.
+O algoritmo converte sinais de distância de obstáculos em velocidades
 lineares e angulares de modo que evite a colisão com obstáculos.
-Além do treinamento permitir que o robô
-colida com o obstáculo, foi observado que o tempo de treinamento desses modelos
+Além do treinamento permitir que o robô colida com o obstáculo, foi observado que o tempo de treinamento desses modelos
 foram de 8,6 e 11,4 horas de treinamento para \textit{Deep Q-learning Network}
 e \textit{Deep Deterministic Policy Gradient}, respectivamente.
 Segundo o
@@ -259,7 +266,8 @@ desta forma temos um algoritmo baseado na equação \textit{Q-learning} que perm
 aprender um sistema de entrada e saída contínua.
 \begin{flalign} 
     A_t = \mu(S_t)\\
-    Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha[R + \gamma  Q(S_{t +1},\mu(S_{t+1})) - Q(S_t,A_t)]
+    A_{t+1} = \mu(S_{t+1})\\
+    Q(S_t,A_t) \leftarrow Q(S_t,A_t) + \alpha[R + \gamma  Q(S_{t +1}, A_{t+1}) - Q(S_t,A_t)]
 \end{flalign}
 Enquanto temos uma rede neural $Q$ que busca encontrar a função ação-valor ótima $Q^*$, temos uma
 nova rede neural que através do gradiente ascendente buscar encontrar a
@@ -357,10 +365,9 @@ adaptações.
 
 \section{Conclusão da revisão bibliográfica}
 \label{sec:conclusao:revisao:bibliografica}
-Os artigos demostram que para um problema simples como posicionar ou estabilizar
+Os artigos demostram que para um problema simples como mover
 um robô de acionamento diferencial em um ambiente sem obstáculos ou com
-obstáculos simples, as soluções com aprendizado de máquina por reforço
-envolvendo variantes de \textit{Q-learning} visando substituir as
-leis clássicas de controle não são interessantes, pois usam muito mais
+obstáculos simples para uma posição desejada. As soluções com aprendizado de máquina por reforço
+visando substituir as leis clássicas de controle não são interessantes. Uma vez que  usam muito mais
 memória, processamento e apresentam resultados equiparáveis quando não
 piores que as soluções utilizando leis clássicas de controle. 

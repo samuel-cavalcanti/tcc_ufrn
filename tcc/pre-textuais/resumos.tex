@@ -12,16 +12,18 @@
 % para numeração seja outro.
 \mychapterast{Resumo}
 O principal objetivo deste trabalho é criar um  sistema de
-controle para um andador robótico inteligente que seja capaz de
-posicionar o robô em uma posição em um ambiente livre de obstáculos.
-Este trabalho visa estudar e avaliar algoritmos de aprendizado
+controle para um andador robótico inteligente de acionamento diferencial.
+O sistema deverá ser capaz de
+mover o robô para uma posição desejada em um ambiente livre de obstáculos.
+Este trabalho também visa estudar e avaliar algoritmos de aprendizado
 de máquina na elaboração de um sistema de controle cinemático.
 Primeiro foi feito um levantamento literário sobre a utilização de
 aprendizado de máquina para criação de controladores cinemáticos em robôs moveis de acionamento
 diferencial. Segundo foi construído uma versão do robô no simulador Coppeliasim.
 Terceiro foi projetado um controlador cinemático, onde dois modelos
-cinemáticos foram obtidos através da modelagem dos parâmetros de uma
-rede neural artificial utilizando as equações que limitam o movimento
+cinemáticos foram obtidos através dos  treinamentos de duas
+redes neurais artificiais. A quantidade de nós e funções de ativação
+das redes neurais foram obtidas através das equações que limitam o movimento
 cinemático do robô. Um modelo faz uma regressão não linear dos
 parâmetros das equações, já outro modelo realiza uma regressão linear.
 Os dados utilizados para o treinamento da rede são obtidos
@@ -30,10 +32,9 @@ Já o controlador utiliza uma abordagem
 clássica que possui  dois controladores
 Proporcionais, integrais, derivativos (P.I.D),
 onde ambos os parâmetros dos P.I.Ds foram obtidos empiricamente.
-Para avaliar os modelos cinemáticos foi calculado o modelo analítico,
-e coletado um conjunto de
-dados de testes que foi utilizado para o cálculo do erro quadrático
-médio para todos os modelos cinemáticos.
+Para avaliar os modelos cinemáticos foi calculado o modelo analítico
+e mensurado o erro quadrático
+médio de todos os modelos em um conjunto de testes.
 Para avaliar todo o sistema foi posicionado um alvo e observado o robô no 
 seu trabalho em chegar até alvo mensurando a distância do robô até o
 alvo e o seu angulo ao longo do tempo. Os resultados do erro quadrático médio e os
@@ -41,13 +42,13 @@ gráficos de distância e angulo sobre o tempo
 mostraram que os dois modelos cinemáticos são equivalentes ao modelo
 analítico. Comparando os parâmetros do modelo que realiza a
 regressão não linear com o modelo analítico,
-percebe-se os parâmetros como os raios das rodas e a distância entre as rodas,
-se aproximaram da solução analítica, já para os ângulos das rodas foram
-encontrados outros valores que quando somados se aproximam da solução
-analítica. Foi concluído durante o levantamento literário que
-utilizar a abordagem clássica para criar um controlador é a melhor opção do
-que soluções com aprendizado de máquina devido ao uso de memória e
-processamento com ambas soluções apresentando resultados equiparáveis.
+percebe-se os parâmetros como os raios das rodas e a distância entre as rodas
+se aproximaram da solução analítica. No entanto os modelos encontraram um
+par de ângulos das rodas diferente da solução analítica.
+Foi concluído durante o levantamento literário que
+utilizar a abordagem clássica para criar um controlador é melhor do que
+utilizar aprendizado de máquina no contexto deste trabalho. Aprendizado de máquia usa mais de memória e
+processamento  e possui resultados equiparáveis a abordagem clássica.
 Foi concluído que encontrar o modelo cinemático de forma analítica é mais
 simples do que usando algoritmos de aprendizado
 de máquina, no entanto aplicar a modelagem  de sistemas para encontrar
