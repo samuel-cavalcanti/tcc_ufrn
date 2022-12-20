@@ -69,8 +69,11 @@
 % Este pacote não faz parte da distribuição padrão do LaTeX.
 \usepackage{lib/noitemsep}
 % Para as citações bibliográficas
-%\usepackage[alf]{abntex2cite}
-\usepackage[abbr]{lib/harvard}	% As chamadas são sempre abreviadas
+% Hiperreferências dentro do texto e montagem dos links do índices dos
+% para os leitores de pdf (deve ser o último pacote a ser inserido).
+\usepackage[breaklinks,colorlinks=false,allcolors=black]{hyperref}
+% \usepackage[abbr]{lib/harvard}	% As chamadas são sempre abreviadas
+\usepackage[alf]{abntex2cite}
 %\harvardparenthesis{square}	% Colchetes nas chamadas
 %\harvardyearparenthesis{round}	% Parêntesis nos anos das referências
 %\renewcommand{\harvardand}{e}	% Substituir "&" por "e" nas referências
@@ -94,9 +97,7 @@
 \usepackage[portuguese, ruled, linesnumbered]{algorithm2e}
 % Capítulos com títulos em um formato "decorado"
 \usepackage{lib/capitulos}
-% Hiperreferências dentro do texto e montagem dos links do índices dos
-% para os leitores de pdf (deve ser o último pacote a ser inserido).
-\usepackage[breaklinks]{hyperref}
+
 % Referência correta de ambientes flutuantes (como figuras, tabelas e algoritmos).
 \usepackage[all]{hypcap}
 
@@ -168,7 +169,9 @@
 % O estilo das referências bibliográficas
 %
 
-\bibliographystyle{bibliografia/ppgee}
+% \bibliographystyle{bibliografia/ppgee}
+\bibliographystyle{abntex2-alf}
+
 
 %
 % O espaçamento entre linhas
@@ -180,23 +183,7 @@
 % Para a criação do glossário (ou lista de símbolos)
 \makenomenclature
 
-% Lista de arquivos a serem processados. Estes comandos "includeonly" são
-% dispensáveis e devem obrigatoriamente ser comentados na hora de gerar o
-% documento definitivo. Eles servem para compilar apenas parte do documento.
-% É útil, durante a redação, para que não se tenha de compilar todo o
-% documento a cada vez que se faz uma alteração. Por exemplo, se eu estou
-% fazendo alterações na dedicatória e as outras partes não têm interesse no
-% momento, posso incluir (descomentar) a linha "\includeonly{preambulo}"
-%\includeonly{rosto}
-%\includeonly{catalograficos}
-%\includeonly{preambulo}
-%\includeonly{resumos}
-%\includeonly{introducao/introducao}
-%\includeonly{estilo/estilo}
-%\includeonly{matematica/matematica}
-%\includeonly{figuras/figuras}
-%\includeonly{conclusao/conclusao}
-%\includeonly{apendice/apendice}
+
 
 % Inicia o texto
 \begin{document}
