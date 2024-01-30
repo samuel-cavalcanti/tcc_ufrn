@@ -1,5 +1,4 @@
 use rand::Rng;
-use zmq_remote_api::sim::Sim;
 use zmq_remote_api::{sim, RemoteAPIError};
 
 pub struct Target {
@@ -54,7 +53,7 @@ impl Target {
         }
     }
 
-    pub fn move_target(&mut self, sim: &Sim) -> Result<(), RemoteAPIError> {
+    pub fn move_target<S: sim::Sim>(&mut self, sim: &S) -> Result<(), RemoteAPIError> {
         self.update_index();
         self.update_position(sim)?;
         Ok(())
@@ -72,9 +71,9 @@ impl Target {
         self.current_index = new_index;
     }
 
-    fn update_position(&self, sim: &Sim) -> Result<(), RemoteAPIError> {
+    fn update_position<S: sim::Sim>(&self, sim: &S) -> Result<(), RemoteAPIError> {
         let position = self.positions[self.current_index].clone();
-        sim.set_object_position(self.handle, sim::HANDLE_WORLD, position)?;
+        sim.sim_set_object_position(self.handle, sim::HANDLE_WORLD, position)?;
 
         Ok(())
     }

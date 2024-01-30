@@ -7,8 +7,8 @@ pub struct Accelerometer {
 }
 
 impl Accelerometer {
-    pub fn read(&self, coppeliasim: &Sim) -> Result<Vec<f32>, RemoteAPIError> {
-        let (result, forces, _torques) = coppeliasim.read_force_sensor(self.handle)?;
+    pub fn read<S: Sim>(&self, coppeliasim: &S) -> Result<Vec<f32>, RemoteAPIError> {
+        let (result, forces, _torques) = coppeliasim.sim_read_force_sensor(self.handle)?;
 
         if result == sim::RESULT_SUCCESS {
             let acceleration = forces

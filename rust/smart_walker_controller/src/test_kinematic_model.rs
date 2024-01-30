@@ -11,9 +11,9 @@ pub fn run() {
 
     let mut robot_pos = vec![0.0, 0.0, 0.0];
     let mut target_pos = vec![0.0, 0.0];
-    let mut kinematic_input = vec![0.0, 0.0, 0.0];
+    let mut kinematic_input = [0.0, 0.0, 0.0];
 
-    let limit = vec![0.16133267, 0.04307239, 12.0_f32.to_radians()];
+    let limit = [0.16133267, 0.04307239, 12.0_f32.to_radians()];
 
     let mut target_getted = 0;
 
@@ -49,7 +49,7 @@ pub fn run() {
 
         for i in 0..3 {
             if kinematic_input[i].abs() > limit[i] {
-                kinematic_input[i] = kinematic_input[i] / kinematic_input[i] * limit[i];
+                kinematic_input[i] = limit[i];
             }
         }
 
@@ -82,7 +82,7 @@ pub fn run() {
     sim.stop_simulation();
 }
 
-fn is_goal(target_pos: &Vec<f32>, robot_pos: &Vec<f32>) -> bool {
+fn is_goal(target_pos: &[f32], robot_pos: &[f32]) -> bool {
     let thirty_centimeters = 0.3;
     let distance = [0, 1]
         .iter()
