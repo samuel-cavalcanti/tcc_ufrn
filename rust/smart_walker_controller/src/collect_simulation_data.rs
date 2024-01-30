@@ -12,7 +12,7 @@ pub fn collect_data() {
     let mut csv_writer = csv::Writer::from_path("data.csv").unwrap();
 
     csv_writer
-        .write_record(&["target_x", "target_y", "theta", "motor_left", "motor_right"])
+        .write_record(["target_x", "target_y", "theta", "motor_left", "motor_right"])
         .unwrap();
 
     loop {
@@ -30,7 +30,7 @@ pub fn collect_data() {
             sim.update_target();
         }
 
-        let velocity = controller::ManualController::get_velocity();
+        let velocity = controller::manual_controller::get_velocity();
 
         match velocity {
             Some(vel) => {
